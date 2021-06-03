@@ -9,6 +9,12 @@ function update_containers()
 }
 
 
+#
+# Check whether a container with the given name exists locally
+#
+# Usage:
+#   if container_exists "fabulous_container"; then echo "My container exists."; else echo "Where is my container?"; fi
+#
 function container_exists()
 {
 	update_containers

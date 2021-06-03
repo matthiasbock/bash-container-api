@@ -12,6 +12,9 @@ function container_set_hostname()
 
 function container_create_user()
 {
+  local container_name="$1"
+  local user="$2"
+  # TODO: If user does not exist already...
   $container_cli exec -t -u root "$container_name" /bin/bash -c "mkdir -p /home/$user && useradd -d /home/$user -s /bin/bash $user"
 }
 
@@ -30,7 +33,9 @@ function container_add_file()
 #  fi
 
   local container_name="$1"
-  local
+  local user="$2"
+  local filename="$3"
+  local fullpath="$4"
   $container_cli cp "$filename" "$container_name:$fullpath"
   $container_cli exec -t "$container_name" bash -c "chown -R $user.$user $fullpath"
 }
@@ -39,5 +44,6 @@ function container_add_file()
 function container_minimize()
 {
 	local container="$1"
+  # TODO: That's very crude. Maybe differentiate more...
 	$container_cli exec -t -u root -w /root "$container" bash -c "find /tmp/ /var/lock/ /var/log/ /var/mail/ /var/run/ /var/spool /var/tmp/ /usr/share/doc/ /usr/share/man/ -type f -exec rm -fv {} \; ; rm -fv /root/.bash_history /home/$user/.bash_history; apt-get autoremove -y --allow-remove-essential" || :
 }
