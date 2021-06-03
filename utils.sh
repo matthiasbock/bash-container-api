@@ -10,7 +10,7 @@ function container_set_hostname()
 }
 
 
-function container_create_user(parameter)
+function container_create_user()
 {
   $container_cli exec -t -u root "$container_name" /bin/bash -c "mkdir -p /home/$user && useradd -d /home/$user -s /bin/bash $user"
 }
