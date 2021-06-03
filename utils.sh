@@ -1,5 +1,5 @@
 #
-# This file contains functions for the manipulation of existing containers.
+# This file contains misc functions for the manipulation of existing containers.
 #
 
 function container_set_hostname()

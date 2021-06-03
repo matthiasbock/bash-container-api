@@ -1,3 +1,7 @@
+#
+# This file contains functions for volume management.
+#
+
 
 function update_volumes()
 {

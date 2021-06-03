@@ -1,3 +1,6 @@
+#
+# This file contains functions for creation and control of containers.
+#
 
 
 function update_containers()

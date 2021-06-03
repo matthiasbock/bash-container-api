@@ -1,3 +1,7 @@
+#
+# This functions in this file manage container images.
+#
+
 
 function update_images()
 {

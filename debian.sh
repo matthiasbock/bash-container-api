@@ -1,5 +1,7 @@
-#!/bin/bash
-
+#
+# This file contains various Debian-specific functions,
+# primarily to manage the installed packages in a container.
+#
 
 function install_packages()
 {

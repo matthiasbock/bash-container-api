@@ -1,3 +1,7 @@
+#
+# Some functions to manage container networking options.
+#
+
 
 function update_networks()
 {
