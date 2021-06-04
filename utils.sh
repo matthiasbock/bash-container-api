@@ -66,7 +66,9 @@ function container_add_file()
 
   # Check if destination path already exists
   if container_test "$container_name" -e "$fullpath"; then
-    echo "Error: Destination file $fullpath already exists. Aborting."; return 1;
+    echo "Warning: Destination file $fullpath exists. Removing...";
+    container_rm_file "$container_name" "$fullpath" \
+     || { echo "Failed to remove existing destination file."; return 1; }
   fi
 
   # Create destination folder if non-existent
@@ -85,6 +87,15 @@ function container_add_file()
    || { echo "Error: Failed to change file ownership."; return 1; }
 
   return 0
+}
+
+
+function container_rm_file()
+{
+  local container_name="$1"
+  local filename="$2"
+  $container_cli exec -t -u root "$container_name" rm -f "$filename"
+  return $?
 }
 
 
