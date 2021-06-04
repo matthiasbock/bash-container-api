@@ -53,8 +53,6 @@ function container_debian_install_package_from_url()
   local retval=0
   local pkg_archive="/var/cache/apt/archives/"
 
-  set -x
-
   # Download file
   echo "Installing package $filename from $url ..."
   wget --progress=dot "$url" -O "$filename" \
@@ -69,13 +67,13 @@ function container_debian_install_package_from_url()
 
   # Invoke dpkg to install it
   if [ $retval == 0 ]; then
-    $container_cli exec -it -u root -w "$pkg_archive" "$container_name" dpkg -i "$filename" \
+    $container_cli exec -it -u root -w "$pkg_archive" "$container_name" dpkg -i --force-depends "$filename" \
      || { echo "dpkg returned an error."; retval=1; }
      $container_cli exec -t -u root -w "$pkg_archive" "$container_name" rm -f "$filename"
   fi
 
   # Inform about the success of the procedure
-  if [ $retval == 0]; then
+  if [ $retval == 0 ]; then
     echo "Package installation was successful."
   else
     echo "Package installation failed."

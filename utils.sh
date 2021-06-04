@@ -66,12 +66,12 @@ function container_add_file()
 
   # Check if destination path already exists
   if container_test "$container_name" -e "$fullpath"; then
-    echo "Error: Destination file already exists. Aborting."; return 1;
+    echo "Error: Destination file $fullpath already exists. Aborting."; return 1;
   fi
 
   # Create destination folder if non-existent
   if ! container_test "$container_name" -d "$dstpath"; then
-    echo "The destination path does not exist. Creating..."
+    echo "The destination path does not exist. Creating $dstpath ..."
     $container_cli exec -t -u root "$container_name" mkdir -p "$dstpath" \
      || { echo "Failed to create destination folder."; return 1; }
   fi
