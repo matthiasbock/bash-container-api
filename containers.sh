@@ -100,7 +100,12 @@ function container_remove()
 		echo "not found. Skipping."
 		return 1;
 	fi
-	$container_cli container stop $container &> /dev/null
-	$container_cli container rm $container &> /dev/null
+
+  # TODO: Only if container is rnunning:
+	$container_cli container stop $container
+
+	$container_cli container rm $container
+  # TODO: Verify container removal
+
 	echo "done."
 }
