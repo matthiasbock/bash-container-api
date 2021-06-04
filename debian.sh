@@ -3,7 +3,7 @@
 # primarily to manage the installed packages in a container.
 #
 
-function install_packages()
+function container_debian_install_packages()
 {
 	local pkgs=$*
 	local pkgs=$(echo -n $pkgs | sed -e "s/  / /g")
@@ -26,7 +26,7 @@ function install_packages()
 }
 
 
-function install_package_bundles()
+function container_debian_install_package_bundle()
 {
 	local package_bundles=$*
 	local pkgs=""
@@ -34,14 +34,14 @@ function install_package_bundles()
 	       echo "Adding package bundle: \"$bundle\""
 	       local pkgs="$pkgs $(cat $common/package-bundles/$bundle.list)"
 	done
-	install_packages $pkgs
+	container_debian_install_packages $pkgs
 }
 
 
-function install_package_list_from_file()
+function container_debian_install_package_list_from_file()
 {
 	local pkgs=$(echo -n $(cat $1))
-	install_packages $pkgs
+	container_debian_install_packages $pkgs
 }
 
 
