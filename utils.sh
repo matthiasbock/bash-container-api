@@ -48,7 +48,7 @@ function container_add_file()
     fullpath=$(realpath "$srcfile")
     echo "Warning: No destination argument was given. Assuming ${fullpath}."
   elif [ "${dst: 1}" == "." ]; then
-    echo "Error: The destination in the container cannot be specified as a relative path."
+    echo "Error: The file's destination within the container cannot be specified as a relative path."
     return 1
   elif [ "${dst: -1}" == "/" ]; then
     # Is a folder: append filename
@@ -66,16 +66,28 @@ function container_add_file()
 
   # Check if destination path already exists
   if container_test "$container_name" -e "$fullpath"; then
-    echo "Warning: Destination file $fullpath exists. Removing...";
+    echo -n "Warning: A file named $fullpath already exists within the container. Removing...";
     container_rm_file "$container_name" "$fullpath" \
-     || { echo "Failed to remove existing destination file."; return 1; }
+     || { echo "failed."; echo "Error: Failed to remove existing destination file. Aborting."; return 1; }
+    if container_test "$container_name" -e "$fullpath"; then
+      echo "failed."
+      echo "Echo: rm returned without error, nonetheless the file still exists. Aborting."
+      return 1
+    fi
+    echo "success."
   fi
 
   # Create destination folder if non-existent
   if ! container_test "$container_name" -d "$dstpath"; then
-    echo "The destination path does not exist. Creating $dstpath ..."
+    echo "Warning: The destination path $dstpath does not exist. Creating..."
     $container_cli exec -t -u root "$container_name" mkdir -p "$dstpath" \
-     || { echo "Failed to create destination folder."; return 1; }
+     || { echo "Error: Failed to create destination folder. Aborting."; return 1; }
+    if ! container_test "$container_name" -d "$dstpath"; then
+      echo "failed."
+      echo "Echo: mkdir returned without error, nonetheless the folder is still missing. Aborting."
+      return 1
+    fi
+    echo "success."
   fi
 
   # Copy the file into the container
