@@ -26,7 +26,7 @@ function container_debian_install_packages()
 }
 
 
-function container_debian_install_package_bundle()
+function container_debian_install_package_bundles()
 {
 	local package_bundles=$*
 	local pkgs=""
