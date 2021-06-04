@@ -51,6 +51,7 @@ function container_debian_install_package_from_url()
   local url="$2"
   local filename="$(basename $url)"
   local retval=0
+  local pkg_archive="/var/cache/apt/archives/"
 
   set -x
 
@@ -61,16 +62,16 @@ function container_debian_install_package_from_url()
 
   # Insert file into container
   if [ $retval == 0 ]; then
-    container_add_file "$container_name" "$filename" "/var/cache/apt/archives/$filename" \
+    container_add_file "$container_name" root "$filename" "$pkg_archive" \
      || { echo "Failed to add downloaded file to container."; retval=1; }
   fi
   rm -f "$filename"
 
   # Invoke dpkg to install it
   if [ $retval == 0 ]; then
-    $container_cli exec -it -u root -w "/var/cache/apt/archvies/" "$container_name" /bin/bash -c "dpkg -i \"$filename\"" \
+    $container_cli exec -it -u root -w "$pkg_archive" "$container_name" dpkg -i "$filename" \
      || { echo "dpkg returned an error."; retval=1; }
-     $container_cli exec -it -u root -w "/var/cache/apt/archvies/" "$container_name" /bin/bash -c "rm -f \"$filename\""
+     $container_cli exec -t -u root -w "$pkg_archive" "$container_name" rm -f "$filename"
   fi
 
   # Inform about the success of the procedure
