@@ -78,6 +78,8 @@ function container_commit()
 	local container_name="$1"
   local image_name="$2"
   local tag="$3"
+  # TODO: ugly; better use bash arrays
+  local config="$4 $5 $6 $7 $8 $9 ${10}"
 
 	echo -n "Committing container '$container_name' as image 'localhost/$image_name:$tag' ... "
 	if ! container_exists "$container_name"; then
@@ -90,7 +92,11 @@ function container_commit()
 		$container_cli image rm "localhost/$container_name"
 	fi
 
-	export COMMIT_ID=$($container_cli commit --pause "$container_name")
+  local config_args=""
+  for arg in $config; do
+    config_args="$config_args -c $arg"
+  done
+	export COMMIT_ID=$($container_cli commit --pause $config_args "$container_name")
 	echo "Commit id: $COMMIT_ID"
 
   echo "Tagging as 'localhost/$image_name:$tag' ..."
