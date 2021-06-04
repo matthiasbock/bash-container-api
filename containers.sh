@@ -76,18 +76,27 @@ function container_start()
 function container_commit()
 {
 	local container_name="$1"
-	echo -n "Committing container '$container_name' ... "
+  local image_name="$2"
+  local tag="$3"
+
+	echo -n "Committing container '$container_name' as image 'localhost/$image_name:$tag' ... "
 	if ! container_exists "$container_name"; then
 		echo "not found. Skipping."
 		return 1;
 	fi
+  echo ""
+
 	if image_exists "localhost/$container_name"; then
 		$container_cli image rm "localhost/$container_name"
 	fi
-	local tag=$($container_cli commit "$container_name")
-	echo "Commit id: $tag"
-	$container_cli tag "$tag" "$container_name"
-	echo "Tagged as '$container_name'. Done."
+
+	export COMMIT_ID=$($container_cli commit --pause "$container_name")
+	echo "Commit id: $COMMIT_ID"
+
+  echo "Tagging as 'localhost/$image_name:$tag' ..."
+	$container_cli tag "$COMMIT_ID" "$image_name:$tag"
+
+  echo "Done."
 }
 
 
