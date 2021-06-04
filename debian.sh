@@ -12,10 +12,10 @@ function container_debian_install_packages()
 		return 0
 	fi
 	echo "Installing $count packages ..."
-	$container_cli exec -it -u root $container_name apt-get install -y $pkgs
+	$container_cli exec -it -u root $container_name apt-get -q install -y $pkgs
 	if [ $? != 0 ]; then
-		echo "That failed. Trying with aptitude instead of apt ..."
-		$container_cli exec -it -u root $container_name aptitude install $pkgs
+		echo "Package installation with apt-get failed. Re-trying with aptitude ..."
+		$container_cli exec -it -u root $container_name aptitude -q install $pkgs
 	fi
 
 #if [ "$pkgs" != "" ]; then
