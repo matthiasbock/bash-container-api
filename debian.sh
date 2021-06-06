@@ -82,6 +82,16 @@ function container_debian_install_package_from_url()
 }
 
 
+function container_debian_install_build_dependencies()
+{
+  local container_name="$1"
+  local package="$2"
+
+  # TODO: Check if container is up; start/stop if necessary
+  $container_cli exec -it -u root "$container_name" /bin/bash -c "apt-get -q update && apt-get -q build-dep -y $package"
+}
+
+
 function blacklist_packages()
 {
 	config="/etc/apt/preferences"
