@@ -4,9 +4,10 @@
 
 function container_set_hostname()
 {
-	local container="$1"
+	local container_name="$1"
 	local hostname="$2"
-	$container_cli exec -t -u root -w /etc "$container" /bin/bash -c "echo \"$hostname\" > hostname"
+	container_exec "$container_name" /bin/bash -c "echo \"$hostname\" > /etc/hostname"
+  return $?
 }
 
 
@@ -15,7 +16,8 @@ function container_create_user()
   local container_name="$1"
   local user="$2"
   # TODO: If user does not exist already...
-  $container_cli exec -t -u root "$container_name" /bin/bash -c "mkdir -p /home/$user && useradd -d /home/$user -s /bin/bash $user"
+  container_exec "$container_name" /bin/bash -c "mkdir -p /home/$user && chown -R $user.$user /home/$user && useradd -d /home/$user -s /bin/bash $user"
+  return $?
 }
 
 
@@ -25,7 +27,7 @@ function container_test()
   local expr1="$2"
   local expr2="$3"
 
-  $container_cli exec -t -u root "$container_name" /usr/bin/test $expr1 $expr2
+  container_exec "$container_name" /usr/bin/test $expr1 $expr2
   return $?
 }
 
@@ -106,7 +108,8 @@ function container_rm_file()
 {
   local container_name="$1"
   local filename="$2"
-  $container_cli exec -t -u root "$container_name" rm -f "$filename"
+  # TODO: If file exists...
+  container_exec "$container_name" rm -f "$filename"
   return $?
 }
 
