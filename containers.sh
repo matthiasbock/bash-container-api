@@ -70,7 +70,13 @@ function container_start()
 }
 
 
-# TODO container_stop
+function container_stop()
+{
+  local container_name="$1"
+  # TODO: Only stop if running
+  $container_cli container stop "$container_name"
+  # TODO: Report success/failure
+}
 
 
 function container_commit()
