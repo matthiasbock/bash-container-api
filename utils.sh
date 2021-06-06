@@ -38,9 +38,8 @@ function container_test()
 function container_add_file()
 {
   local container_name="$1"
-  local owner="$2"
-  local srcfile="$(realpath "$3")"
-  local dst="$4"
+  local srcfile="$(realpath "$2")"
+  local dst="$3"
 
   # Evaluate the destination argument
   local fname="$(basename $srcfile)"
@@ -95,10 +94,6 @@ function container_add_file()
   # Copy the file into the container
   $container_cli cp "$srcfile" "${container_name}:${fullpath}" \
    || { echo "Error: Failed to copy file to container."; return 1; }
-
-  # Change file ownership as requested
-  $container_cli exec -t -u root "$container_name" /bin/bash -c "chown $owner \"$fullpath\"" \
-   || { echo "Error: Failed to change file ownership."; return 1; }
 
   return 0
 }
