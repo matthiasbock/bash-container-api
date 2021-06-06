@@ -70,6 +70,16 @@ function container_start()
 }
 
 
+function container_exec()
+{
+  local container_name="$1"
+  # TODO: Use a nicer way to enumerate arguments
+  local args="$2 $3 $5 $5 $6 $7 $8 $9 ${10}"
+  # TODO: Start/stop container if necessary
+  $container_cli exec -it -u root "$container_name" $args
+}
+
+
 function container_stop()
 {
   local container_name="$1"
