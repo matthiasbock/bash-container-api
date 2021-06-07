@@ -76,7 +76,7 @@ function container_exec()
   # TODO: Use a nicer way to enumerate arguments
   #local args="$2 $3 $5 $5 $6 $7 $8 $9 ${10}"
   # TODO: Start/stop container if necessary
-  $container_cli exec -it -u root "$container_name" "${2}" "${3}" "${4}" "${5}" "${6}" "${7}" "${8}" "${9}" "${10}"
+  $container_cli exec -it -u root "$container_name" /bin/bash -c "${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9}"
   return $?
 }
 
