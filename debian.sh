@@ -60,7 +60,7 @@ function container_debian_install_package_from_url()
 
   # Insert file into container
   if [ $retval == 0 ]; then
-    container_add_file "$container_name" root "$filename" "$pkg_archive" \
+    container_add_file "$container_name" "$filename" "$pkg_archive" \
      || { echo "Failed to add downloaded file to container."; retval=1; }
   fi
   rm -f "$filename"
@@ -69,7 +69,7 @@ function container_debian_install_package_from_url()
   if [ $retval == 0 ]; then
     $container_cli exec -it -u root -w "$pkg_archive" "$container_name" dpkg -i --force-depends "$filename" \
      || { echo "dpkg returned an error."; retval=1; }
-     $container_cli exec -t -u root -w "$pkg_archive" "$container_name" rm -f "$filename"
+    $container_cli exec -t -u root -w "$pkg_archive" "$container_name" rm -f "$filename"
   fi
 
   # Inform about the success of the procedure
