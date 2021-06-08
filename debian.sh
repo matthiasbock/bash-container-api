@@ -11,6 +11,11 @@ function container_debian_install_packages()
 	if [ $count == 0 ]; then
 		return 0
 	fi
+  if [ "$apt_update_complete" == "" ]; then
+    echo "Updating package lists..."
+    container_exec $container_name apt-get -q update
+    export apt_update_complete=1
+  fi
 	echo "Installing $count packages ..."
 	$container_cli exec -it -u root $container_name apt-get -q install -y $pkgs
 	if [ $? != 0 ]; then
