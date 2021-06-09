@@ -118,6 +118,6 @@ function remove_packages()
 	local pkgs=$*
 	echo "Removing $(echo $pkgs | wc -w) packages ..."
 	$container_cli exec -it -u root -w /root "$container_name" apt-get purge -y --allow-remove-essential $pkgs
-	$container_cli exec -it -u root -w /root "$container_name" apt-get autoremove -y --allow-remove-essential
+	#$container_cli exec -it -u root -w /root "$container_name" apt-get autoremove -y --allow-remove-essential
 	echo "Package removal complete."
 }

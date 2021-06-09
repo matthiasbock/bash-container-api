@@ -112,10 +112,30 @@ function container_rm_file()
 }
 
 
-function container_minimize()
+#
+# This function reads a list of expendable files and folders from a given file.
+#
+function container_expendables_import()
 {
-	local container="$1"
-  # TODO: That's very crude. Maybe differentiate more...
-	$container_cli exec -t -u root -w /root "$container" \
-    bash -c "find /tmp/ /var/lock/ /var/log/ /var/mail/ /var/run/ /var/spool /var/tmp/ /usr/share/doc/ /usr/share/man/ -type f -exec rm -fv {} \; ; rm -fv /root/.bash_history /home/$user/.bash_history; apt-get autoremove -y --allow-remove-essential" || :
+  local expendables_list="$1"
+
+  export container_expendables=$(cat "$expendables_list")
+}
+
+
+#
+# This function removes the files and folders listed in $container_expendables from the container.
+#
+function container_cleanup()
+{
+	local container_name="$1"
+
+  # TODO: Check, if container is running
+  #container_start $container_name
+  #container_stop $container_name
+
+  echo "Cleaning up..."
+	container_exec $container_name \
+    "find $container_expendables -type f -exec rm -fv {} \;"
+  echo "Cleanup complete."
 }
