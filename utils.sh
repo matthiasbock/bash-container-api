@@ -130,12 +130,20 @@ function container_cleanup()
 {
 	local container_name="$1"
 
+  if [ "$container_expendables" == "" ]; then
+    echo "Error: Failed to clean up. No expendable folders are defined. Skipping."
+    return 1
+  fi
+
   # TODO: Check, if container is running
   #container_start $container_name
   #container_stop $container_name
 
   echo "Cleaning up..."
+  echo "$container_expendables"
+  set -x
 	container_exec $container_name \
     "find $container_expendables -type f -exec rm -fv {} \;"
+  set +x
   echo "Cleanup complete."
 }
