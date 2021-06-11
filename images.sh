@@ -18,3 +18,16 @@ function image_exists()
 	fi
 	return 0;
 }
+
+function image_create_from_folder()
+{
+  local path="$1"
+  #local uri="$2"
+  local tag="$2"
+
+  # Import folder as new image
+  COMMIT_ID=$(cd "$path" && sudo tar -cf - . | podman import - "$tag")
+
+  # Add a tag to the new image
+  #$container_cli tag "$COMMIT_ID" "$tag"
+}
