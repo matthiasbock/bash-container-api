@@ -17,11 +17,10 @@ function container_create_user()
   local user="$2"
 
   # TODO: If user does not exist already...
-  container_exec $container_name \
-    "mkdir -p /home/$user && \
-     useradd -d /home/$user -s /bin/bash $user && \
-     chown -R $user.$user /home/$user"
-  return $?
+  container_exec $container_name mkdir -p /home/$user || return 1
+  container_exec $container_name useradd -d /home/$user -s /bin/bash $user || return 1
+  container_exec $container_name chown -R $user.$user /home/$user || return 1
+  return 0
 }
 
 

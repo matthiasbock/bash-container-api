@@ -93,7 +93,8 @@ function container_debian_install_build_dependencies()
   local package="$2"
 
   # TODO: Check if container is up; start/stop if necessary
-  container_exec $container_name "apt-get -q update && apt-get -q build-dep -y $package"
+  container_exec $container_name apt-get -q update || return 1
+  container_exec $container_name apt-get -q build-dep -y $package || return 1
 }
 
 
