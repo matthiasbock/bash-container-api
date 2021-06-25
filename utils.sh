@@ -15,6 +15,7 @@ function container_create_user()
 {
   local container_name="$1"
   local user="$2"
+
   # TODO: If user does not exist already...
   container_exec $container_name \
     "mkdir -p /home/$user && \

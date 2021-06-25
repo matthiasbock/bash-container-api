@@ -94,7 +94,7 @@ function container_exec()
   # TODO: Use a nicer way to enumerate arguments
   #local args="$2 $3 $5 $5 $6 $7 $8 $9 ${10}"
   # TODO: Start/stop container if necessary
-  $container_cli exec -it -u root "$container_name" /bin/bash -c "${2} ${3} ${4} ${5} ${6} ${7} ${8} ${9}"
+  $container_cli exec -it -u root "$container_name" "${@:2}"
   return $?
 }
 
@@ -114,20 +114,21 @@ function container_commit()
 	local container_name="$1"
   local image_name="$2"
   local tag="$3"
-  # TODO: ugly; better use bash arrays
-  local config="$4 $5 $6 $7 $8 $9 ${10}"
+  # TODO: Test whether the following variable assignment works:
+  local config="${@:4}"
 
-	echo -n "Committing container '$container_name' as image 'localhost/$image_name:$tag' ... "
+	echo "Committing container '$container_name' as image 'localhost/$image_name:$tag'... "
 	if ! container_exists "$container_name"; then
-		echo "not found. Skipping."
+		echo "Error: Container $container_name not found. Commit failed."
 		return 1;
 	fi
-  echo ""
 
+  # Overwrite existing images without asking
 	if image_exists "localhost/$container_name"; then
 		$container_cli image rm "localhost/$container_name"
 	fi
 
+  # Apply
   local config_args=""
   for arg in $config; do
     config_args="$config_args -c $arg"
