@@ -26,28 +26,46 @@ function container_exists()
 }
 
 
+function container_constructor_default()
+{
+  # Note: It is necessary to specify -it, otherwise the container will exit prematurely.
+	$container_cli create \
+    -it \
+    $container_networking \
+		--name "$container_name" \
+    --arch "$architecture" \
+		"$base_image"
+}
+
+
 function create_container()
 {
 	local container="$1"
-	# Containers may be constructed differently. Using the referenced constructor.
 	local constructor="$2"
-	echo -n "Creating container '$container' ... "
-	if ! container_exists "$container"; then
-		$constructor
-		local retval=$?
-		if [ $retval == 0 ]; then
-			sleep 1
-		else
-			echo "Container constructor exited with a non-zero return value $retval."
-		fi
-		if ! container_exists "$container"; then
-			echo "Error: Failed to create container '$container'."
-			return 1
-		fi
-		echo "done."
+
+	echo "Creating container '$container'... "
+	if container_exists "$container"; then
+    echo "A container named $container already exists. Aborting."
+    return 1
+  fi
+
+  if [ "$constructor" == "" ]; then
+    constructor=container_constructor_default
+  fi
+	$constructor
+	local retval=$?
+	if [ $retval == 0 ]; then
+		sleep 1
 	else
-		echo "already exists. Skipping."
+		echo "Container constructor exited with a non-zero return value $retval."
 	fi
+
+	if ! container_exists "$container"; then
+		echo "Error: Failed to create container '$container'."
+		return 1
+	fi
+
+	echo "Container created successfully."
 	return 0
 }
 
