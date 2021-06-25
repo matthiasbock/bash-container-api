@@ -5,7 +5,7 @@
 
 function update_volumes()
 {
-	export volumes=$($container_cli volume ls --format "{{.Name}}")
+	export volumes=$($container_cli volume ls --format "{{.Name}}" | sed -ze "s/\n/ /g")
 }
 
 

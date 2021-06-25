@@ -5,7 +5,7 @@
 
 function update_containers()
 {
-	export containers=$($container_cli container ls -a --format "{{.Names}}" | awk '{ print $1 }')
+	export containers=$($container_cli container ls -a --format "{{.Names}}" | awk '{ print $1 }' | sed -ze "s/\n/ /g")
 }
 
 

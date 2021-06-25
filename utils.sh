@@ -119,7 +119,7 @@ function container_expendables_import()
 {
   local expendables_list="$1"
 
-  export container_expendables=$(cat "$expendables_list")
+  export container_expendables=$(cat "$expendables_list" | sed -ze "s/\n/ /g")
 }
 
 

@@ -5,7 +5,7 @@
 
 function update_images()
 {
-	export images=$($container_cli image ls -a --format "{{.Repository}}:{{.Tag}}")
+	export images=$($container_cli image ls -a --format "{{.Repository}}:{{.Tag}}" | sed -ze "s/\n/ /g")
 }
 
 
