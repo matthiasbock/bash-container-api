@@ -124,26 +124,24 @@ function container_expendables_import()
 
 
 #
-# This function removes the files and folders listed in $container_expendables from the container.
+# This function removes the given files and folders from the container.
 #
-function container_cleanup()
+function container_expendables_delete()
 {
-	local container_name="$1"
+  local container_name="$1"
+  local container_expendables="${@:2}"
 
+  echo "Deleting expendable files from container..."
   if [ "$container_expendables" == "" ]; then
-    echo "Error: Failed to clean up. No expendable folders are defined. Skipping."
-    return 1
+    echo "Warning: No expendable files and folders specified. Skipping."
+    return 0
   fi
 
   # TODO: Check, if container is running
   #container_start $container_name
   #container_stop $container_name
 
-  echo "Cleaning up..."
-  echo "$container_expendables"
-  set -x
-	container_exec $container_name \
+  container_exec $container_name \
     "find $container_expendables -type f -exec rm -fv {} \;"
-  set +x
-  echo "Cleanup complete."
+  echo "Done."
 }
