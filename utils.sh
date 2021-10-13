@@ -74,7 +74,7 @@ function container_add_file()
   dstpath=$(dirname "$fullpath")
 
   # Check if destination path already exists
-  if container_test "$container_name" -e "$fullpath"; then
+  if container_test "$container_name" -f "$fullpath"; then
     echo -n "Warning: A file named $fullpath already exists within the container. Removing...";
     container_rm_file "$container_name" "$fullpath" \
      || { echo "failed."; echo "Error: Failed to remove existing destination file. Aborting."; return 1; }
