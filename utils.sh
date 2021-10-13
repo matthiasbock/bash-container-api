@@ -44,6 +44,11 @@ function container_add_file()
   local srcfile="$(realpath "$2")"
   local dst="$3"
 
+  if [ ! -e "$srcfile" ]; then
+	echo "Error: File not found: $srcfile"
+	return 1
+  fi
+
   # Evaluate the destination argument
   local fname="$(basename $srcfile)"
   local fullpath
