@@ -146,6 +146,6 @@ function container_expendables_delete()
   #container_start $container_name
   #container_stop $container_name
 
-  container_exec $container_name find $container_expendables -type f -exec rm -fv {} \;
+  container_exec $container_name find $container_expendables -type f -exec rm -fv {} \; || true
   echo "Done."
 }
