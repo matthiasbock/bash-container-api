@@ -87,6 +87,32 @@ function container_debian_install_package_from_url()
 }
 
 
+#
+# Install a package without using APT
+#
+# Example: container_debian_install_manually bullseye amd64 mc
+#
+function container_debian_install_manually()
+{
+  local container_name="$1"
+  local release="$2"
+  local architecture="$3"
+  local package="$4"
+  local pool="ftp.de.debian.org/debian/pool"
+
+  # Determine direct URL for deb package download
+  local details="https://packages.debian.org/$release/$architecture/$package/download"
+  local url=$(wget -q "$details" -O - | fgrep "$pool" | cut -d\" -f2 | head -n1)
+  if [ "$url" == "" ]; then
+    echo "Error: Found no candidate for $package on $details. Aborting."
+    return 1
+  fi
+
+  # Install from URL
+  container_debian_install_package_from_url $container_name $url || return 1
+}
+
+
 function container_debian_install_build_dependencies()
 {
   local container_name="$1"
