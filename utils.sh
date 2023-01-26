@@ -29,7 +29,8 @@ function container_create_user()
   home="/home/$user"
 
   # Check if the user already exists
-  if id "$user" &>/dev/null; then
+  uid=$(container_exec id $user | fgrep uid)
+  if [ "$uid" != "" ]; then
     echo "Creating user $user: Already exists. Skipping."
   else
     echo -n "Creating user $user with home at $home ... "
@@ -73,7 +74,8 @@ function container_create_groups()
   # For each group argument:
   for group in $groups; do
     # Check if group exists...
-    if [ $(getent group $group) ]; then
+    gid=$(container_exec getent group $group)
+    if [ "$gid" != "" ]; then
       echo "Group exists: $group"
     else
       # ...otherwise create it:
