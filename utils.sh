@@ -14,7 +14,7 @@ function container_set_hostname()
 #
 # Within the specified container create a user with the specified name
 #
-# Usage: container_create_user my_container username
+# Usage: container_create_user my_container username [optional: group1 group2 ...]
 #
 # @return 0  upon success
 # @return 1  upon errors
@@ -23,16 +23,31 @@ function container_create_user()
 {
   local container_name="$1"
   local user="$2"
+  local groups="${@:3}"
+
+  shell="/bin/bash"
+  home="/home/$user"
 
   # Check if the user already exists
   if id "$user" &>/dev/null; then
-    echo "User \"$user\" already exists. Skipping."
-    return 0
+    echo "Creating user $user: Already exists. Skipping."
+  else
+    echo "Creating user $user with home at $home ..."
+    container_exec $container_name mkdir -p $home || return 1
+    container_exec $container_name useradd -d $home -s $shell $user || return 1
+    container_exec $container_name chown -R $user.$user $home || return 1
+    echo "Done."
   fi
 
-  container_exec $container_name mkdir -p /home/$user || return 1
-  container_exec $container_name useradd -d /home/$user -s /bin/bash $user || return 1
-  container_exec $container_name chown -R $user.$user /home/$user || return 1
+  # Adding user to groups
+  if [ "$groups" != "" ]; then
+    for group in groups; do
+      echo "Adding $user to group $group ..."
+      container_exec $container_name usermod -aG $group $user
+    done
+    echo "Done."
+  fi
+
   return 0
 }
 
