@@ -32,18 +32,23 @@ function container_create_user()
   if id "$user" &>/dev/null; then
     echo "Creating user $user: Already exists. Skipping."
   else
-    echo "Creating user $user with home at $home ..."
+    echo -n "Creating user $user with home at $home ... "
     container_exec $container_name mkdir -p $home || return 1
     container_exec $container_name useradd -d $home -s $shell $user || return 1
     container_exec $container_name chown -R $user.$user $home || return 1
-    echo "Done."
+    echo "ok."
   fi
 
   # Adding user to groups
   if [ "$groups" != "" ]; then
-    for group in groups; do
-      echo "Adding $user to group $group ..."
+    # Make sure the requested groups exist
+    container_create_groups $container_name $groups
+
+    # Add user to one group after another
+    for group in $groups; do
+      echo -n "Adding $user to group $group ... "
       container_exec $container_name usermod -aG $group $user
+      echo "ok."
     done
     echo "Done."
   fi
