@@ -37,6 +37,26 @@ function container_create_user()
 }
 
 
+#
+# Within the specified container create the specified groups
+#
+# Usage: container_create_groups my_container group1 group2 ...
+#
+# @return 0  upon success
+# @return 1  upon errors
+#
+function container_create_groups()
+{
+  local container_name="$1"
+  local groups="${@:2}"
+
+  for group in groups; do
+    container_exec $container_name groupadd -f $group || return 1
+  done
+  return 0
+}
+
+
 function container_test()
 {
   local container_name="$1"
