@@ -13,6 +13,7 @@ source networking.sh
 source images.sh
 source volumes.sh
 source containers.sh
+source user.sh
 source utils.sh
 source debian.sh
 
