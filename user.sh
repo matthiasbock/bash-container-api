@@ -23,8 +23,17 @@ function container_create_user()
     echo "Creating user $user: Already exists. Skipping."
   else
     echo -n "Creating user $user with home at $home ... "
+
+    # In case a group named $user already exists, add the new user to it.
+    add_to_group=""
+    gid=$(container_exec $container_name getent group $group)
+    if [ "$gid" != "" ]; then
+      add_group="-g $group"
+    fi
+
+    # Create a user and a group named $user
     container_exec $container_name mkdir -p $home || return 1
-    container_exec $container_name useradd -d $home -s $shell $user || return 1
+    container_exec $container_name useradd -d $home -s $shell $add_to_group $user || return 1
     container_exec $container_name chown -R $user.$user $home || return 1
     echo "ok."
   fi
