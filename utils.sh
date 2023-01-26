@@ -11,12 +11,25 @@ function container_set_hostname()
 }
 
 
+#
+# Within the specified container create a user with the specified name
+#
+# Usage: container_create_user my_container username
+#
+# @return 0  upon success
+# @return 1  upon errors
+#
 function container_create_user()
 {
   local container_name="$1"
   local user="$2"
 
-  # TODO: If user does not exist already...
+  # Check if the user already exists
+  if id "$user" &>/dev/null; then
+    echo "User \"$user\" already exists. Skipping."
+    return 0
+  fi
+
   container_exec $container_name mkdir -p /home/$user || return 1
   container_exec $container_name useradd -d /home/$user -s /bin/bash $user || return 1
   container_exec $container_name chown -R $user.$user /home/$user || return 1
