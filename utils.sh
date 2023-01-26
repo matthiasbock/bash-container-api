@@ -70,8 +70,17 @@ function container_create_groups()
   local container_name="$1"
   local groups="${@:2}"
 
-  for group in groups; do
-    container_exec $container_name groupadd -f $group || return 1
+  # For each group argument:
+  for group in $groups; do
+    # Check if group exists...
+    if [ $(getent group $group) ]; then
+      echo "Group exists: $group"
+    else
+      # ...otherwise create it:
+      echo -n "Creating group $group ... "
+      container_exec $container_name groupadd -f $group || return 1
+      echo "ok."
+    fi
   done
   return 0
 }
