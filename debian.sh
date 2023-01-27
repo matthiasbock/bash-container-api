@@ -124,9 +124,11 @@ function get_debian_package_download_urls() {
 
   # Fetch the package's page, which (hopefully) contains some download links
   local url="https://packages.debian.org/$debian_release/$target_architecture/$package_name/download"
-  local page=$(get_page $url) || return 1
+  echo "Fetching $url ..." >&2
+  local page=$(get_page $url) || { echo "Error: get_page() failed." >&2; return 2; }
+
   # The page cannot be empty
-  [[ "$page" != "" ]] || return 2
+  [[ "$page" != "" ]] || { echo "Error: Page is empty." >&2; return 3; }
 
   # Apply regular expressions to extract download URLs
   urls=$(
@@ -135,7 +137,7 @@ function get_debian_package_download_urls() {
         | cut -d\" -f2
         )
   # An empty list indicates a non-existent package
-  [[ "$urls" != "" ]] || return 3
+  [[ "$urls" != "" ]] || { echo "Error: Failed to parse any URLs from page." >&2; return 4; }
 
   # Return results
   echo $urls
@@ -161,22 +163,24 @@ function debian_download_package() {
 
   # Fetch URLs for package file download
   local urls=$(get_debian_package_download_urls $package_name $debian_release $target_architecture)
-  [[ "$urls" != "" ]] || return 1
+  local retval=$?
+  [[ $retval == 0 ]] || return $retval
+  [[ "$urls" != "" ]] || { echo "Error: Failed get any URLs." >&2; return 5; }
 
   # Work out the target filename
   local url=$(echo $urls | cut -d" " -f1)
   # local cache="/var/cache/apt/archives"
   local cache="/tmp"
   local filename=$(basename $url)
-  [[ "$filename" != "" ]] || return 2
+  [[ "$filename" != "" ]] || { echo "Error: Failed to work out target filename." >&2; return 6; }
   local filepath="$cache/$filename"
 
   # Download file
-  mkdir -p $cache || return 3
-  [[ -d $cache ]] || return 4
+  mkdir -p $cache || return 7
+  [[ -d $cache ]] || return 8
   get_file "$filepath" $urls &> /dev/null
-  [[ $? == 0 ]] || return 5
-  [[ -f $filepath ]] || return 6
+  [[ $? == 0 ]] || { echo "Error: File download failed." >&2; return 9; }
+  [[ -f $filepath ]] || return 10
 
   # Return full path to downloaded package
   echo $filepath
@@ -201,13 +205,14 @@ function container_debian_download_package_and_install()
 
   # Download the requested package
   filename=$(debian_download_package $package_name $debian_release $target_architecture)
-  [[ $? == 0 ]] || return 1
-  [[ "$filename" != "" ]] || return 1
-  [[ -f "$filename" ]] || return 1
+  local retval=$?
+  [[ $retval == 0 ]] || return $retval
+  [[ "$filename" != "" ]] || return 11
+  [[ -f "$filename" ]] || return 12
 
   # Copy the file to the container
   container_add_file $container_name $filename $filename
-  container_test -f $filename || return 1
+  container_test -f $filename || return 13
 
   # Install package inside container
   container_exec $container_name dpkg -i $filename
