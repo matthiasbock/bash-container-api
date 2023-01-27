@@ -141,39 +141,86 @@ function get_debian_package_download_urls() {
 
 
 #
+# Download a Debian package into the host's package archive folder
+#
+# Usage:
+#  container_debian_install_with_dpkg my_container bash
+#  container_debian_install_with_dpkg my_container bash buster
+#  container_debian_install_with_dpkg my_container bash bullseye amd64
+#
+# @return 0 and the full path to the downloaded package on stdout
+# @return 1 upon errors
+#
+function debian_download_package() {
+  local package_name="$1"
+  local debian_release="$2"
+  local target_architecture="$3"
+
+  # Fetch URLs for package file download
+  local urls=$(get_debian_package_download_urls $package_name $debian_release $target_architecture)
+  [[ "$urls" != "" ]] || return 1
+
+  # Work out the target filename
+  local url=$(echo $urls | head -n1)
+  local filename=$(basename url)
+  local cache="/var/cache/apt/archives"
+  local filepath="$cache/$filename"
+
+  # Download file
+  sudo mkdir -p $cache
+  [[ -d $cache ]] || return 1
+  sudo chmod o+w $cache
+  get_file $filepath $urls
+  local retval=$?
+  sudo chmod o-w $cache
+  [[ $retval == 0 ]] || return 1
+  [[ -f $filepath ]] || return 1
+
+  # Return full path to downloaded package
+  echo $filepath
+  return 0
+}
+
+
+#
 # Download and install a package without invoking apt or apt-get
 #
-# Example: container_debian_install_manually bullseye amd64 mc
+# Usage:
+#  container_debian_download_package_and_install my_container bash
+#  container_debian_download_package_and_install my_container bash buster
+#  container_debian_download_package_and_install my_container bash bullseye amd64
 #
-function container_debian_install_manually()
+function container_debian_download_package_and_install()
 {
   local container_name="$1"
-  local release="$2"
-  local architecture="$3"
-  local package="$4"
-  local pool="ftp.de.debian.org/debian/pool"
+  local package_name="$2"
+  local debian_release="$3"
+  local target_architecture="$4"
 
-  # Determine direct URL for deb package download
-  local details="https://packages.debian.org/$release/$architecture/$package/download"
-  local url=$(wget -q "$details" -O - | fgrep "$pool" | cut -d\" -f2 | head -n1)
-  if [ "$url" == "" ]; then
-    echo "Error: Found no candidate for $package on $details. Aborting."
-    return 1
-  fi
+  # Download the requested package
+  filename=$(debian_download_package $package_name $debian_release $target_architecture)
+  [[ $? == 0 ]] || return 1
+  [[ "$filename" != "" ]] || return 1
+  [[ -f "$filename" ]] || return 1
 
-  # Install from URL
-  container_debian_install_package_from_url $container_name $url || return 1
+  # Copy the file to the container
+  container_add_file $container_name $filename $filename
+  container_test -f $filename || return 1
+
+  # Install package inside container
+  container_exec $container_name dpkg -i $filename
+  return $?
 }
 
 
 function container_debian_install_build_dependencies()
 {
   local container_name="$1"
-  local package="$2"
+  local package_name="$2"
 
   # TODO: Check if container is up; start/stop if necessary
   container_exec $container_name apt-get -q update || return 1
-  container_exec $container_name apt-get -q build-dep -y $package || return 1
+  container_exec $container_name apt-get -q build-dep -y $package_name || return 1
 }
 
 
