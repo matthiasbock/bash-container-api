@@ -110,14 +110,14 @@ function get_debian_package_download_urls() {
 
   # Two arguments provided
   if [ "$2" != "" ]; then
-    local debian_release="$1"
+    local debian_release="$2"
   else
     local debian_release="$default_release"
   fi
 
   # Three arguments provided
   if [ "$3" != "" ]; then
-    local target_architecture="$2"
+    local target_architecture="$3"
   else
     local target_architecture="$default_arch"
   fi
@@ -212,7 +212,7 @@ function container_debian_download_package_and_install()
 
   # Copy the file to the container
   container_add_file $container_name $filename $filename
-  container_test -f $filename || return 13
+  container_test $container_name -f $filename || { echo "Error: Failed to add file to container." >&2; return 13; }
 
   # Install package inside container
   container_exec $container_name dpkg -i $filename
