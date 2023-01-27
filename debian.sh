@@ -2,6 +2,9 @@
 # This file contains various Debian-specific functions,
 # primarily to manage the installed packages in a container.
 #
+# Note:
+# Requires functions from local.sh and web.sh.
+#
 
 function container_debian_install_packages()
 {
@@ -163,17 +166,18 @@ function debian_download_package() {
   # Work out the target filename
   local url=$(echo $urls | head -n1)
   local filename=$(basename url)
-  local cache="/var/cache/apt/archives"
+  if is_set path_apt_package_cache; then
+    local cache=$path_apt_package_cache
+  else
+    local cache="/var/cache/apt/archives"
+  fi
   local filepath="$cache/$filename"
 
   # Download file
-  sudo mkdir -p $cache
+  mkdir -p $cache || return 1
   [[ -d $cache ]] || return 1
-  sudo chmod o+w $cache
   get_file $filepath $urls
-  local retval=$?
-  sudo chmod o-w $cache
-  [[ $retval == 0 ]] || return 1
+  [[ $? == 0 ]] || return 1
   [[ -f $filepath ]] || return 1
 
   # Return full path to downloaded package
