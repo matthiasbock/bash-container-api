@@ -13,7 +13,7 @@
 # @return 0 upon success and the page content on stdout
 # @return 1 upon errors and possibly an error message on stdout
 #
-function get_url() {
+function get_page() {
   local user_agent_default="bash-container-library"
   local url="$1"
 

@@ -124,7 +124,7 @@ function get_debian_package_download_urls() {
 
   # Fetch the package's page, which (hopefully) contains some download links
   local url="https://packages.debian.org/$debian_release/$target_architecture/$package_name/download"
-  local page=$(get_url $url) || return 1;
+  local page=$(get_page $url) || return 1;
   # The page cannot be empty
   [[ "$page" != "" ]] || return 1;
 
