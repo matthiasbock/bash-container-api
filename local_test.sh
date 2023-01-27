@@ -14,37 +14,25 @@ testing_begins $0 $script_under_test
 #
 
 # Test is_set
-echo -n "is_set returns true: "
+echo -n "is_set returns true:  "
 export TEST="123"
-if is_set TEST; then
-  echo "Success"
-else
-  echo "Failed"
-fi
+is_set TEST
+test_eval $?
 
 echo -n "is_set returns false: "
 unset TEST
-if ! is_set TEST; then
-  echo "Success"
-else
-  echo "Failed"
-fi
+! is_set TEST
+test_eval $?
 
 # bash is available, as it is the shell used to run this test
-echo -n "is_program_available returns true: "
-if is_program_available bash; then
-  echo "Success"
-else
-  echo "Failed"
-fi
+echo -n "is_program_available returns true:  "
+is_program_available bash
+test_eval $?
 
 # There's no such program
 echo -n "is_program_available returns false: "
-if ! is_program_available theehee; then
-  echo "Success"
-else
-  echo "Failed"
-fi
+! is_program_available theehee
+test_eval $?
 
 # Finished testing
 testing_ends $0 $script_under_test
