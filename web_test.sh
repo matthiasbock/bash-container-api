@@ -61,5 +61,23 @@ echo -n "The page is empty:           "
 [[ $page == "" ]]
 test_eval $?
 
+#
+# Test function get_file()
+#
+echo -n "Download an existing Debian package:   "
+filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
+rm -f $filepath
+url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.2+20201114-2_amd64.deb"
+get_file $filepath $url
+test_eval $?
+
+echo -n "Request a non-existent Debian package: "
+filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
+rm -f $filepath
+url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw12345_amd64.deb"
+get_file $filepath $url
+[[ $? != 0 ]]
+test_eval $?
+
 # Finished testing
 testing_ends $0 $script_under_test
