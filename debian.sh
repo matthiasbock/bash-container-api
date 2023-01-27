@@ -124,9 +124,9 @@ function get_debian_package_download_urls() {
 
   # Fetch the package's page, which (hopefully) contains some download links
   local url="https://packages.debian.org/$debian_release/$target_architecture/$package_name/download"
-  local page=$(get_page $url) || return 1;
+  local page=$(get_page $url) || return 1
   # The page cannot be empty
-  [[ "$page" != "" ]] || return 1;
+  [[ "$page" != "" ]] || return 2
 
   # Apply regular expressions to extract download URLs
   urls=$(
@@ -135,7 +135,7 @@ function get_debian_package_download_urls() {
         | cut -d\" -f2
         )
   # An empty list indicates a non-existent package
-  [[ "$urls" != "" ]] || return 1;
+  [[ "$urls" != "" ]] || return 3
 
   # Return results
   echo $urls
@@ -164,21 +164,19 @@ function debian_download_package() {
   [[ "$urls" != "" ]] || return 1
 
   # Work out the target filename
-  local url=$(echo $urls | head -n1)
-  local filename=$(basename url)
-  if is_set path_apt_package_cache; then
-    local cache=$path_apt_package_cache
-  else
-    local cache="/var/cache/apt/archives"
-  fi
+  local url=$(echo $urls | cut -d" " -f1)
+  # local cache="/var/cache/apt/archives"
+  local cache="/tmp"
+  local filename=$(basename $url)
+  [[ "$filename" != "" ]] || return 2
   local filepath="$cache/$filename"
 
   # Download file
-  mkdir -p $cache || return 1
-  [[ -d $cache ]] || return 1
-  get_file $filepath $urls
-  [[ $? == 0 ]] || return 1
-  [[ -f $filepath ]] || return 1
+  mkdir -p $cache || return 3
+  [[ -d $cache ]] || return 4
+  get_file "$filepath" $urls &> /dev/null
+  [[ $? == 0 ]] || return 5
+  [[ -f $filepath ]] || return 6
 
   # Return full path to downloaded package
   echo $filepath
