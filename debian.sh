@@ -88,7 +88,60 @@ function container_debian_install_package_from_url()
 
 
 #
-# Install a package without using APT
+# Retrieve a list of download URLs for a package
+#
+# Usage:
+#  get_debian_package_download_urls lynx
+#  get_debian_package_download_urls lynx buster
+#  get_debian_package_download_urls lynx bullseye amd64
+#
+# @return 0 when at least one URL was found and the URLs on stdout
+# @return 1 when no URL could be found
+#
+function get_debian_package_download_urls() {
+  local default_release="stable"
+  local default_arch="amd64"
+
+  # One argument provided
+  local package_name="$1"
+
+  # Two arguments provided
+  if [ "$2" != "" ]; then
+    local debian_release="$1"
+  else
+    local debian_release="$default_release"
+  fi
+
+  # Three arguments provided
+  if [ "$3" != "" ]; then
+    local target_architecture="$2"
+  else
+    local target_architecture="$default_arch"
+  fi
+
+  # Fetch the package's page, which (hopefully) contains some download links
+  local url="https://packages.debian.org/$debian_release/$target_architecture/$package_name/download"
+  local page=$(get_url $url) || return 1;
+  # The page cannot be empty
+  [[ "$page" != "" ]] || return 1;
+
+  # Apply regular expressions to extract download URLs
+  urls=$(
+          grep -E ".*<li>.*<a .*href=\"http.*$package.*\.deb\".*>.*<\/a>.*<\/li>.*" - <<< "$page" \
+        | sed -e "s/.*\"\(http.*\)\".*/\1/g" \
+        | cut -d\" -f2
+        )
+  # An empty list indicates a non-existent package
+  [[ "$urls" != "" ]] || return 1;
+
+  # Return results
+  echo $urls
+  return 0
+}
+
+
+#
+# Download and install a package without invoking apt or apt-get
 #
 # Example: container_debian_install_manually bullseye amd64 mc
 #

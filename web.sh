@@ -6,8 +6,6 @@
 # Requires local.sh to be included earlier.
 #
 
-user_agent_default="bash-container-library"
-
 
 #
 # Retrieve the page at the given URL
@@ -16,6 +14,7 @@ user_agent_default="bash-container-library"
 # @return 1 upon errors and possibly an error message on stdout
 #
 function get_url() {
+  local user_agent_default="bash-container-library"
   local url="$1"
 
   # If no user_agent is defined globally, use the default one.
