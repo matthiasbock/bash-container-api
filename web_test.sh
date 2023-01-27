@@ -68,14 +68,14 @@ echo -n "Download an existing Debian package:   "
 filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
 rm -f $filepath
 url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.2+20201114-2_amd64.deb"
-get_file $filepath $url
+get_file $filepath $url &>/dev/null
 test_eval $?
 
 echo -n "Request a non-existent Debian package: "
 filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
 rm -f $filepath
 url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw12345_amd64.deb"
-get_file $filepath $url
+get_file $filepath $url &>/dev/null
 [[ $? != 0 ]]
 test_eval $?
 

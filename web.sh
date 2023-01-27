@@ -47,7 +47,6 @@ function get_file() {
   # Check arguments
   [[ "$filepath" != "" ]] || return 1
   [[ "$url" != "" ]] || return 1
-  filepath="$(realpath "$filepath")"
 
   # If no user_agent is defined globally, use the default one.
   if ! is_set user_agent; then
@@ -64,11 +63,11 @@ function get_file() {
   if is_program_available aria2c; then
     local dir="$(dirname "$filepath")"
     local fn="$(basename "$filepath")"
-    aria2c -q -c --user-agent="$user_agent" --dir="$dir" --out="$fn" $urls || return 1
+    aria2c -c --user-agent="$user_agent" --dir="$dir" --out="$fn" $urls || return 1
   elif is_program_available wget; then
     wget -c --progress=dot --user-agent="$user_agent" -O "$filepath" $url || return 1
   elif is_program_available curl; then
-    curl -C - --user-agent="$user_agent" -o "$filepath" $url || return 1
+    curl -C - --user-agent "$user_agent" -o "$filepath" $url || return 1
   else
     echo "Error: No download program is available."
     return 1
