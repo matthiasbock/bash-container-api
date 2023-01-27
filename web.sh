@@ -23,15 +23,11 @@ function get_url() {
     local user_agent=user_agent_default;
   fi
 
-  #
-  # Select an available program for download
-  #
+  # Select a program for download
   if is_program_available wget; then
-    wget -q -O - --user-agent="$user_agent" "$url" 2>/dev/null \
-    || { echo "Error: wget failed to get $url."; return 1; }
+    wget -q -O - --user-agent="$user_agent" "$url" 2>/dev/null || return 1
     return 0
+  # TODO: support using curl or aria2c as alternatives
   fi
-
-  echo "Error: No program for web page download is available."
   return 1
 }
