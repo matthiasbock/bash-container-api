@@ -1,13 +1,18 @@
 
 SHELL=bash
 TESTS=$(wildcard *_test.sh)
-TEST_OUT=$(addsuffix .tmp,$(basename $(notdir $(TESTS))))
+TEST_OUT=$(addsuffix .run,$(basename $(notdir $(TESTS))))
 
 
 test: $(TEST_OUT)
 
-%.tmp: %.sh
+%.run: %.sh
+	@chmod +x $<
 	./$<
 
 test-continously:
-	@while [ 1 ]; do make test; sleep 2; inotifywait -e modify Makefile *.sh expendables/*; done;
+	@while [ 1 ]; do \
+		make test; \
+		sleep 2; \
+		inotifywait -e modify Makefile *.sh expendables/*; \
+		done;
