@@ -1,1 +1,6 @@
+bash
+coreutils
+wget
+aria2c
 inotify-tools
+podman
