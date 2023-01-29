@@ -38,10 +38,16 @@ function container_debian_install_package_bundles()
 {
 	local package_bundles=$*
 	local pkgs=""
+
 	for bundle in $package_bundles; do
-	       echo "Adding package bundle: \"$bundle\""
-	       local pkgs="$pkgs $(cat $common/package-bundles/$bundle.list)"
+    if [ ! -f $bundle ]; then
+      echo "Error: Failed to load package bundle: \"$bundle\"" >2
+      return 1
+    fi
+	  echo "Loading package bundle: \"$bundle\""
+	  local pkgs="$pkgs $(cat $bundle)"
 	done
+
 	container_debian_install_packages $pkgs
 }
 

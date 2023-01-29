@@ -1,6 +1,6 @@
 
 #
-# Functions for convenient operation on the host machine
+# Functions operating on the host machine
 #
 
 
@@ -32,3 +32,9 @@ function is_program_available() {
   fi
   return 1
 }
+
+
+#
+# Return the running Linux kernel's architecture
+#
+# TODO
