@@ -1,2 +1,38 @@
+"
+" Path to system-wide vimrc:
+" /usr/share/vim/vimrc
+"
+
+" Mouse input
 set mouse=
+
+" File type detection
+filetype on
+filetype plugin on
+
+" Syntax highlighting
 syntax on
+
+" Highlight current line
+set cursorline
+
+" Line numbers
+set numbers
+
+" Set shift width to 4 spaces
+set shiftwidth=4
+
+" Set tab width to 4 columns
+set tabstop=4
+
+" Use spaces instead of tabs
+set expandtab
+
+" Do not wrap lines
+set nowrap
+
+" Ignore capital letters during search
+set ignorecase
+
+" Do not save backup files
+set nobackup
