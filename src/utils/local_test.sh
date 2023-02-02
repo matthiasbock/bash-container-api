@@ -1,9 +1,9 @@
 #!/bin/bash
 
-script_under_test=local.sh
+script_under_test=src/utils/local.sh
 
 # Import test framework
-. testing.sh
+. src/testing.sh
 testing_begins $0 $script_under_test
 
 # Import the functions under test

@@ -1,14 +1,14 @@
 #!/bin/bash
 
-script_under_test=debian.sh
+script_under_test=src/debian/debian.sh
 
 # Import test framework
-. testing.sh
+. src/testing.sh
 testing_begins $0 $script_under_test
 
 # Import dependencies
-. local.sh
-. web.sh
+. src/utils/local.sh
+. src/utils/web.sh
 
 # Import the functions under test
 . $script_under_test

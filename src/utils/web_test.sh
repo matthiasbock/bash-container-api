@@ -1,13 +1,13 @@
 #!/bin/bash
 
-script_under_test=web.sh
+script_under_test=src/utils/web.sh
 
 # Import test framework
-. testing.sh
+. src/testing.sh
 testing_begins $0 $script_under_test
 
 # Import dependencies
-. local.sh
+. src/utils/local.sh
 
 # Import the functions under test
 . $script_under_test
