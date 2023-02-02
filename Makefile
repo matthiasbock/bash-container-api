@@ -1,7 +1,7 @@
 
-SHELL=bash
-TESTS=$(wildcard *_test.sh)
-TEST_OUT=$(addsuffix .run,$(basename $(notdir $(TESTS))))
+SHELL=/bin/bash
+TESTS=$(shell find . -maxdepth 4 -type f -name "*_test.sh")
+TEST_OUT=$(addsuffix .run,$(basename $(TESTS)))
 
 
 test: $(TEST_OUT)
@@ -14,5 +14,5 @@ test-continously:
 	@while [ 1 ]; do \
 		make test; \
 		sleep 2; \
-		inotifywait -e modify Makefile *.sh expendables/*; \
+		inotifywait -e modify -r . 2>/dev/null; \
 		done;
