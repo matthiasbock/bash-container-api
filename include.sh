@@ -18,7 +18,7 @@ cd $(realpath $(dirname "${BASH_SOURCE[0]}"))
 . web.sh
 
 # Include functions for container manipulation
-. containers.sh
+. control.sh
 . volumes.sh
 . images.sh
 . networking.sh
