@@ -1,0 +1,12 @@
+make
+cmake
+gradle
+ant
+maven
+rake
+automake
+autoconf
+ninja-build
+bc
+flex
+bison

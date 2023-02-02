@@ -1,0 +1,13 @@
+
+#deb https://security.debian.org/debian-security stable-security main contrib non-free
+# Not functioning, workaround:
+deb https://security.debian.org/debian-security bullseye-security main contrib non-free
+
+deb https://ftp.gwdg.de/pub/linux/debian/debian/ stable main contrib non-free
+deb-src https://ftp.gwdg.de/pub/linux/debian/debian/ stable main contrib non-free
+
+deb https://ftp.gwdg.de/pub/linux/debian/debian/ stable-backports main contrib non-free
+deb-src https://ftp.gwdg.de/pub/linux/debian/debian/ stable-backports main contrib non-free
+
+deb https://ftp.gwdg.de/pub/linux/debian/debian/ stable-updates main contrib non-free
+deb-src https://ftp.gwdg.de/pub/linux/debian/debian/ stable-updates main contrib non-free

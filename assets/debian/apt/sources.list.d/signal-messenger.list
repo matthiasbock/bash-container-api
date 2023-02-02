@@ -1,0 +1,5 @@
+#
+# Signal messenger Debian/Ubuntu package repository
+# https://www.signal.org/download/linux/
+#
+deb https://updates.signal.org/desktop/apt xenial main

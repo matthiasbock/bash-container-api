@@ -1,0 +1,7 @@
+
+#
+# Jitsi VoIP Client
+# https://jitsi.org/Main/InstallJitsiMeetDebianStableRepository
+# https://desktop.jitsi.org/Main/DebianRepository
+#
+deb https://download.jitsi.org stable/

@@ -1,0 +1,9 @@
+
+deb https://packages.microsoft.com/debian/11/prod/ bullseye main
+deb https://packages.microsoft.com/debian/10/prod/ buster main
+deb https://packages.microsoft.com/debian/9/prod/ stretch main
+deb https://packages.microsoft.com/debian/8/prod/ jessie main
+
+deb https://packages.microsoft.com/repos/vscode/ stable main
+deb https://packages.microsoft.com/repos/ms-teams/ stable main
+deb https://packages.microsoft.com/repos/mssql/ trusty main

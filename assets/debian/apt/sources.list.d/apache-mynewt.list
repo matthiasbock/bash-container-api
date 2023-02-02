@@ -1,0 +1,7 @@
+
+#
+# Apache MyNewt
+# https://mynewt.apache.org/latest/newt/install/newt_linux.html
+#
+#deb https://raw.githubusercontent.com/runtimeco/debian-mynewt/master latest main
+deb https://raw.githubusercontent.com/JuulLabs-OSS/debian-mynewt/master latest main

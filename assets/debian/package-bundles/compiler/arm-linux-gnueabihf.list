@@ -1,0 +1,14 @@
+ccache
+gcc-arm-linux-gnueabihf
+g++-arm-linux-gnueabihf
+cpp-arm-linux-gnueabihf
+binutils-arm-linux-gnueabihf
+libc6-dev-armhf-cross
+linux-libc-dev-armhf-cross
+libnewlib-dev
+libnewlib-sh-elf-dev
+libnewlib-nano-arm-none-eabi
+libnewlib-arm-none-eabi
+libstdc++-arm-none-eabi-newlib
+picolibc-arm-none-eabi
+libncurses-dev

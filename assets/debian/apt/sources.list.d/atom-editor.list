@@ -1,0 +1,6 @@
+
+#
+# Atom.io
+# https://linuxways.net/debian/how-to-install-atom-text-editor-on-debian-10/
+#
+deb https://packagecloud.io/AtomEditor/atom/any/ any main

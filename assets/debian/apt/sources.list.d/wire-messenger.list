@@ -1,0 +1,6 @@
+
+#
+# Official Wire messenger app package repository
+# https://ubuntuhandbook.org/index.php/2017/04/install-wire-desktop-client-ubuntu-official-repository/
+#
+deb https://wire-app.wire.com/linux/debian stable main

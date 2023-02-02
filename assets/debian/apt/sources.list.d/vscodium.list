@@ -1,0 +1,6 @@
+
+#
+# Visual Studio Codium package repository
+# https://www.linuxcapable.com/install-vscodium-on-debian-linux/
+#
+deb https://download.vscodium.com/debs vscodium main

@@ -1,0 +1,13 @@
+ccache
+gcc-arm-none-eabi
+g++-arm-none-eabi
+cpp-arm-none-eabi
+binutils-arm-none-eabi
+libc6-dev-armel-cross
+linux-libc-dev-armel-cross
+libnewlib-dev
+libnewlib-sh-elf-dev
+libnewlib-nano-arm-none-eabi
+libnewlib-arm-none-eabi
+libstdc++-arm-none-eabi-newlib
+picolibc-arm-none-eabi

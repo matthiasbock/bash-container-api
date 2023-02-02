@@ -1,0 +1,3 @@
+
+# User privilege specification
+runner	ALL=(ALL:ALL) NOPASSWD:ALL

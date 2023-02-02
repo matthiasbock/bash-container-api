@@ -1,0 +1,13 @@
+
+#
+# OpenProject Project Management
+# https://www.openproject.org/docs/installation-and-operations/installation/packaged/
+#
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/debian 9 main
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/debian 10 main
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/debian 11 main
+
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/ubuntu 16.04 main
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/ubuntu 18.04 main
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/ubuntu 20.04 main
+deb https://dl.packager.io/srv/deb/opf/openproject/stable/12/ubuntu 22.04 main
