@@ -25,6 +25,7 @@ cd $(realpath $(dirname "${BASH_SOURCE[0]}"))
 . user.sh
 . utils.sh
 . debian.sh
+. dependencies.sh
 . expendables.sh
 
 # Finally, make sure a tool for container manipulation is defined

@@ -8,57 +8,86 @@
 
 function container_debian_install_packages()
 {
-	local pkgs=$*
+  local container_name="$1"
+	local pkgs="${@:2}"
 	local pkgs=$(echo -n $pkgs | sed -e "s/  / /g")
 	local count=$(echo -n $pkgs | wc -w)
+
 	if [ $count == 0 ]; then
 		return 0
 	fi
+
   if [ "$apt_update_complete" == "" ]; then
     echo "Updating package lists..."
     container_exec $container_name apt-get -q update
-    export apt_update_complete=1
+    apt_update_complete=1
   fi
-	echo "Installing $count packages ..."
-	$container_cli exec -it -u root $container_name apt-get -q install -y $pkgs
-	if [ $? != 0 ]; then
-		echo "Package installation with apt-get failed. Re-trying with aptitude ..."
-		$container_cli exec -it -u root $container_name aptitude -q install $pkgs
-	fi
 
-#if [ "$pkgs" != "" ]; then
-#      for pkg in $pkgs; do
-#              $container_cli exec -it $container_name apt-get install -y $pkg
-#      done
-#fi
+	echo "Installing $count packages ..."
+	container_exec $container_name apt-get -q install -y $pkgs
+	if [ $? != 0 ]; then
+		echo "Package installation with apt-get failed."
+    echo "Re-trying installation using aptitude ..."
+		container_exec $container_name aptitude -q install -y $pkgs
+    if [ $? != 0 ]; then
+      echo "Package installation with aptitude failed."
+      echo "Re-trying one package after another ..."
+      for pkg in $pkgs; do
+        if [ "$pkg" == "" ]; then
+          continue
+        fi
+        container_exec $container_name apt-get -q install -y $pkg \
+        || { local retval=$?; echo "Error: Installation failed (exit code $retval)."; return $retval; }
+      done
+    fi
+	fi
 }
 
 
 function container_debian_install_package_bundles()
 {
-	local package_bundles=$*
+  local container_name="$1"
+	local package_bundles="${@:2}"
 	local pkgs=""
+
+  if [ "$package_bundles" == "" ]; then
+    return 0
+  fi
 
 	for bundle in $package_bundles; do
     if [ ! -f $bundle ]; then
-      echo "Error: Failed to load package bundle: \"$bundle\"" >2
-      return 1
+      local filename="$shared_dir/package-bundles/$bundle.list"
+      if [ -f $filename ]; then
+        bundle="$filename"
+      else
+        echo "Error: Package bundle not found: \"$bundle\"" >&2
+        return 1
+      fi
     fi
-	  echo "Loading package bundle: \"$bundle\""
-	  local pkgs="$pkgs $(cat $bundle)"
+	  echo -n "Loading package bundle: \"$bundle\"... "
+    add="$(cat "$bundle")" || {
+      echo "Error: Failed to load package bundle from \"$bundle\"." >&2
+      return 2
+    }
+    echo "$(echo $add | wc -w -) package(s)."
+	  local pkgs="$pkgs $add"
 	done
 
-	container_debian_install_packages $pkgs
+  if [ "$pkgs" == "" ]; then
+    return 0
+  fi
+
+  echo -e "Installing additional packages:\n$pkgs"
+	container_debian_install_packages $container_name $pkgs
+  echo "ok."
 }
 
 
-function container_debian_install_package_list_from_file()
-{
-	local pkgs=$(echo -n $(cat $1))
-	container_debian_install_packages $pkgs
-}
-
-
+#
+# Download a Debian package from a given URL and
+# attempt to install it in the container
+# (without installing any possible dependencies)
+#
 function container_debian_install_package_from_url()
 {
   local container_name="$1"
@@ -195,7 +224,8 @@ function debian_download_package() {
 
 
 #
-# Download and install a package without invoking apt or apt-get
+# Download and install a package by name
+# but without invoking apt or apt-get
 #
 # Usage:
 #  container_debian_download_package_and_install my_container bash
@@ -231,8 +261,6 @@ function container_debian_install_build_dependencies()
   local container_name="$1"
   local package_name="$2"
 
-  # TODO: Check if container is up; start/stop if necessary
-  container_exec $container_name apt-get -q update || return 1
   container_exec $container_name apt-get -q build-dep -y $package_name || return 1
 }
 
