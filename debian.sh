@@ -6,16 +6,31 @@
 # Requires functions from local.sh and web.sh.
 #
 
-function container_debian_install_packages()
-{
+#
+# Call apt in a container to install Debian packages by name
+#
+function container_debian_install_packages() {
   local container_name="$1"
-	local pkgs="${@:2}"
-	local pkgs=$(echo -n $pkgs | sed -e "s/  / /g")
-	local count=$(echo -n $pkgs | wc -w)
+	local pkgs=$(echo -n "${@:2}" | sed -e "s/  / /g")
 
-	if [ $count == 0 ]; then
+  # Make sure, container exists and is running
+  # TODO: implement:
+  # ensure_container_running $container_name || return $?
+
+  # Silently return, when no package arguments were given
+	if [ "$pkgs" == "" ]; then
 		return 0
 	fi
+
+  #
+  # Consider it a mistake, when we arrive here
+  # before any package list was downloaded
+  # and attempt a package list update once.
+  #
+
+  #
+  # TODO: apt_update_complete = count the number of list files in /var/...?/apt/lists/...
+  #
 
   if [ "$apt_update_complete" == "" ]; then
     echo "Updating package lists..."
@@ -23,40 +38,61 @@ function container_debian_install_packages()
     apt_update_complete=1
   fi
 
+  # Proceed with package installation
+  local count=$(echo -n $pkgs | wc -w)
 	echo "Installing $count packages ..."
-	container_exec $container_name apt-get -q install -y $pkgs
-	if [ $? != 0 ]; then
-		echo "Package installation with apt-get failed."
-    echo "Re-trying installation using aptitude ..."
-		container_exec $container_name aptitude -q install -y $pkgs
-    if [ $? != 0 ]; then
-      echo "Package installation with aptitude failed."
-      echo "Re-trying one package after another ..."
-      for pkg in $pkgs; do
-        if [ "$pkg" == "" ]; then
-          continue
-        fi
-        container_exec $container_name apt-get -q install -y $pkg \
-        || { local retval=$?; echo "Error: Installation failed (exit code $retval)."; return $retval; }
-      done
+
+  # Try apt-get
+  container_exec $container_name apt-get -q install -y $pkgs
+	[[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+
+  # Try apt
+	echo "Warning: Installation with apt-get failed."
+  echo "Re-trying with apt..."
+	container_exec $container_name apt -q install -y $pkgs
+  [[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+
+  # Try aptitude
+  echo "Warning: Installation with apt failed."
+  echo "Re-trying with aptitude..."
+	container_exec $container_name aptitude -q install -y $pkgs
+  [[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+
+  # Try one after another
+  echo "Warning: Installation with aptitude failed."
+  echo "Re-trying one package after another..."
+  for pkg in $pkgs; do
+    if [ "$pkg" == "" ]; then
+      continue
     fi
-	fi
+    container_exec $container_name apt-get -q install -y $pkg \
+    || { local retval=$?; echo "Error: Installation failed (exit code $retval)."; return $retval; }
+  done
+  echo "Installation successful."
 }
 
 
-function container_debian_install_package_bundles()
-{
+#
+# Load a list of Debian packages by name or filename
+#
+# Default path to look for bundle files is ./debian/package-bundles/
+#
+function container_debian_install_package_bundles() {
   local container_name="$1"
 	local package_bundles="${@:2}"
-	local pkgs=""
 
+  # Silently return, when no bundle arguments were given
   if [ "$package_bundles" == "" ]; then
     return 0
   fi
 
+  # Compile a list of packages from the given bundles
+  local pkgs=""
 	for bundle in $package_bundles; do
+    # Argument is a filename?
     if [ ! -f $bundle ]; then
-      local filename="$shared_dir/package-bundles/$bundle.list"
+      local filename="$assets_dir/debian/package-bundles/$bundle.list"
+      # Argument is a bundle name?
       if [ -f $filename ]; then
         bundle="$filename"
       else
@@ -64,21 +100,23 @@ function container_debian_install_package_bundles()
         return 1
       fi
     fi
-	  echo -n "Loading package bundle: \"$bundle\"... "
+
+	  echo -n "Loading package bundle: \"$bundle\": "
     add="$(cat "$bundle")" || {
       echo "Error: Failed to load package bundle from \"$bundle\"." >&2
       return 2
     }
-    echo "$(echo $add | wc -w -) package(s)."
+    echo "$(echo $add | wc -w) package(s)."
 	  local pkgs="$pkgs $add"
 	done
 
+  # Silently return, when package bundles are empty
   if [ "$pkgs" == "" ]; then
     return 0
   fi
 
   echo -e "Installing additional packages:\n$pkgs"
-	container_debian_install_packages $container_name $pkgs
+	container_debian_install_packages $container_name $pkgs || return $?
   echo "ok."
 }
 
