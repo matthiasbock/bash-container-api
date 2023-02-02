@@ -36,6 +36,7 @@ function container_constructor_default()
 	$container_cli create \
     -it \
     $container_networking \
+    $CONTAINER_CLI_CREATE_ARGS \
 		--name $container_name \
     --arch $container_architecture \
 		"$base_image"
