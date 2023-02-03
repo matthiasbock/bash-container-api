@@ -1,14 +1,3 @@
 
-image: registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library
-
-variables:
-  CONTAINER_CLI: podman
-
-stages:
-  - testing
-
-test_all:
-  stage: testing
-  script:
-    - . /etc/profile
-    - make test
+include:
+  - test.yml
