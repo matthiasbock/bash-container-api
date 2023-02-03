@@ -1,7 +1,9 @@
+sudo
+make
+inotify-tools
 bash
 coreutils
+podman
+aria2c
 wget
 curl
-aria2c
-inotify-tools
-podman
