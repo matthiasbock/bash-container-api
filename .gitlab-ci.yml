@@ -1,5 +1,5 @@
 
-image: registry.bihealth.org:443/bockm/recipes/debian:bullseye-amd64
+image: registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library
 
 variables:
   CONTAINER_CLI: podman
