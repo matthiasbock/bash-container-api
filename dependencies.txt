@@ -4,6 +4,7 @@ inotify-tools
 bash
 coreutils
 podman
-aria2c
+uidmap
+aria2
 wget
 curl
