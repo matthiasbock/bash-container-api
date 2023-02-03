@@ -44,6 +44,9 @@ keys_dir="$assets_dir/keys"
 # Include essential container control functions (create, start, stop etc.)
 . src/control.sh
 
+# Include functions to create smaller, flattened containers
+. src/flatten.sh
+
 # Include functions for the management of container volumes
 . src/volumes.sh
 
