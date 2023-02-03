@@ -34,6 +34,18 @@ function is_program_available() {
 }
 
 
+function is_active_mountpoint()
+{
+  local mountpoint="$1"
+  if [ "$(mount | fgrep $mountpoint)" != "" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+
+
 #
 # Return the running Linux kernel's architecture
 #

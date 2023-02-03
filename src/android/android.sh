@@ -9,34 +9,15 @@
 
 function fetch_rom()
 {
-  # Retrieve ROM archive
+  # Download ROM
   if [ ! -e "$rom_local" ]; then
-    export rom_local=$(basename "$rom_local")
-    wget -c --progress=dot:giga -O "$rom_local" "$rom_url"
+    rom_local=$(basename "$rom_local")
   fi
+  get_file "$rom_url" "$rom_local"
 }
 
 
-function verify_image_integrity()
-{
-  echo "Verifying image integrity..."
-  md5=$(md5sum "$rom_local" | cut -d " " -f 1)
-  if [ "$md5" != "$rom_md5sum" ]; then
-    echo "md5sum is $md5, expected $rom_md5sum."
-    echo "Error: File integrity verification failed. Aborting."
-    exit 1
-  fi
-  sha256=$(sha256sum "$rom_local" | cut -d " " -f 1)
-  if [ "$sha256" != "$rom_sha256sum" ]; then
-    echo "sha256sum is $sha256, expected $rom_sha256sum."
-    echo "Error: File integrity verification failed. Aborting."
-    exit 1
-  fi
-  echo "Verification successful."
-}
-
-
-function unpack_boot_partition()
+function android_unpack_boot_partition()
 {
   echo "Extracting boot partition..."
   unzip -o "$rom_local" boot.img \
@@ -53,18 +34,8 @@ function unpack_boot_partition()
 }
 
 
-function is_active_mountpoint()
-{
-  local mountpoint="$1"
-  if [ "$(mount | fgrep $mountpoint)" != "" ]; then
-    return 0
-  else
-    return 1
-  fi
-}
 
-
-function unpack_system_partition()
+function android_unpack_system_partition()
 {
   echo "Extracting system partition from ROM..."
   unzip -o "$rom_local" system.new.dat system.transfer.list \
@@ -95,7 +66,7 @@ function unpack_system_partition()
 }
 
 
-function mkimage()
+function android_mkimage()
 {
   set -e
 
@@ -123,12 +94,4 @@ function mkimage()
   cp -av $(which qemu-arm-static) image/
 
   set +e
-}
-
-
-function container_setup()
-{
-  mkimage
-
-  # TODO: Copy all files into the container
 }

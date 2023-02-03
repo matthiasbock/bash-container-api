@@ -14,10 +14,13 @@ include_sh="${BASH_SOURCE[0]}"
 bash_container_library="$(dirname "$include_sh")"
 bash_container_library="$(realpath "$bash_container_library")"
 cd "$bash_container_library"
+assets_dir="$bash_container_library/assets"
+keys_dir="$assets_dir/keys"
 
 # Include some helper functions operating locally
 . src/utils/local.sh
 . src/utils/web.sh
+. src/utils/checksums.sh
 
 # Include functions for container manipulation
 . src/control.sh
