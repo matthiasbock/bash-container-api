@@ -36,7 +36,7 @@ cd "$bash_container_library"
 #
 if is_set CONTAINER_CLI; then
   # Use cli defined by the caller
-  container_cli=CONTAINER_CLI
+  container_cli="$CONTAINER_CLI"
 fi
 if [ "$container_cli" != "" ]; then
   if [ "$container_cli" == "stub" ]; then
