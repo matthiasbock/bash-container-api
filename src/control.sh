@@ -30,7 +30,7 @@ function container_exists()
 {
   local container_name="$1"
 	local container_names=$(get_container_names || return $?)
-	[[ "$(echo "$container_names" | fgrep $container_name)" != "" ]]
+	[[ "$container_names" =~ "$container_name" ]]
   return $?
 }
 
