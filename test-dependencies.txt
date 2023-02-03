@@ -1,0 +1,11 @@
+sudo
+git
+make
+inotify-tools
+bash
+coreutils
+podman
+uidmap
+aria2
+wget
+curl
