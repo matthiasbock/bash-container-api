@@ -1,11 +1,22 @@
+
 #
-# This file contains functions for creation and control of containers.
+# This file contains elementary containers control functions.
 #
 
 
-function update_containers()
+#
+# Return a (space-separated) list of all containers
+# present on the machine or in the userspace, respectively
+#
+function get_container_names()
 {
-	export containers=$($container_cli container ls -a --format "{{.Names}}" | awk '{ print $1 }' | sed -ze "s/\n/ /g")
+	local names="$($container_cli container ls -a --format "{{.Names}}")"
+  local retval=$?
+  if [ $retval != 0 ]; then
+    echo "Error: Failed to list container names." >&2
+    return $retval
+  fi
+  echo $names
 }
 
 
