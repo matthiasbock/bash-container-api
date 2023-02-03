@@ -1,0 +1,14 @@
+
+image: registry.bihealth.org:443/bockm/recipes/debian:bullseye-amd64
+
+variables:
+  CONTAINER_CLI: podman
+
+stages:
+  - testing
+
+test_all:
+  stage: testing
+  script:
+    - . /etc/profile
+    - make test
