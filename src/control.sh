@@ -21,68 +21,84 @@ function get_container_names()
 
 
 #
-# Check whether a container with the given name exists locally
+# Check whether a container with the given name exists
 #
 # Usage:
 #   if container_exists "fabulous_container"; then echo "My container exists."; else echo "Where is my container?"; fi
 #
 function container_exists()
 {
-	update_containers
-	local container_name="$1"
-	if [ "$(echo "$containers" | fgrep $container_name)" == "" ]; then
-		return 1;
-	fi
-	return 0;
+  local container_name="$1"
+	local container_names=$(get_container_names || return $?)
+	[[ "$(echo "$container_names" | fgrep $container_name)" != "" ]]
+  return $?
 }
 
 
-function container_constructor_default()
-{
-  [[ "$container_name" != "" ]] || { echo "Error: Container name not specified."; exit 2; }
-  [[ "$container_architecture" != "" ]] || { echo "Error: Container architecture not specified."; exit 3; }
-  [[ "$base_image" != "" ]] || { echo "Error: Base image not specified."; exit 4; }
-
-  # Note: It is necessary to specify -it, otherwise the container will exit prematurely.
-	$container_cli create \
-    -it \
-    $container_networking \
-    $CONTAINER_CLI_CREATE_ARGS \
-		--name $container_name \
-    --arch $container_architecture \
-		"$base_image"
-}
-
-
-function create_container()
+#
+# Create a container with the given name and,
+# optionally, specify which function to call as constructor
+#
+function container_create()
 {
 	local container_name="$1"
-	local constructor="$2"
+  local base_image="$2"
+  local container_architecture="$3"
+	local constructor="$4"
 
-	echo "Creating container '$container_name'... "
+  # Check function arguments
+  if [ "$container_name" == "" ]; then
+    echo "Error: Container name not specified." >&2
+    return 4
+  fi
+  if [ "$base_image" == "" ]; then
+    echo "Error: Base image not specified." >&2
+    return 5
+  fi
+  if [ "$container_architecture" == "" ]; then
+    echo "Error: Container architecture not specified." >&2
+    return 6
+  fi
+
+  # Make sure, a container with the same name does not exists already
+  echo "Creating container '$container_name'... " >&2
 	if container_exists $container_name; then
-    echo "A container named $container_name already exists. Aborting."
+    echo "Error: A container with this name already exists." >&2
     return 1
   fi
 
-  if [ "$constructor" == "" ]; then
-    constructor=container_constructor_default
+  # Create container or call external constructor
+  if [ "$constructor" != "" ]; then
+    echo "Calling custom container constructor: $constructor" >&2
+    $constructor $container_name $base_image $container_architecture $constructor
+    local retval=$?
+  	if [ $retval != 0 ]; then
+  		echo "Warning: Custom container constructor exited with non-zero return code $retval." >&2
+  	fi
+  else
+    # Note: It is necessary to specify -it, otherwise the container will not remain up after creation.
+    $container_cli create \
+      -it \
+      $container_networking \
+      $CONTAINER_CLI_CREATE_ARGS \
+  		--name $container_name \
+      --arch $container_architecture \
+  		"$base_image" 1>&2
+    local retval=$?
+    if [ $retval != 0 ]; then
+  		echo "Warning: Container create command exited with non-zero return code $retval." >&2
+  	fi
   fi
-	$constructor
-	local retval=$?
-	if [ $retval == 0 ]; then
-		sleep 1
-	else
-		echo "Container constructor exited with a non-zero return value $retval."
-	fi
 
+  # Wait for the container to become ready
+  sleep 1
+
+  # Verify container creation
 	if ! container_exists $container_name; then
-		echo "Error: Failed to create container '$container_name'."
+		echo "Error: Container creation failed." >&2
 		return 1
 	fi
-
-	echo "Container created successfully."
-	return 0
+	echo "Container created successfully." >&2
 }
 
 
