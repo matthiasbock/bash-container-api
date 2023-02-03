@@ -149,6 +149,6 @@ CONTAINER_CLI_CREATE_ARGS="--privileged"
 . bash-container-library/include.sh
 
 # Create privileged container
-create_container my_privileged_container
+container_create my_privileged_container
 ...
 ~~~
