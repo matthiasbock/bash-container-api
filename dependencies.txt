@@ -1,6 +1,7 @@
 bash
 coreutils
 wget
+curl
 aria2c
 inotify-tools
 podman
