@@ -74,17 +74,17 @@ else
 
   # Proxy for package archives accessed via HTTP
   if [ "${HTTP_PROXY:+set}" == set ]; then
-    echo "Acquire::http::Proxy \"${HTTP_PROXY}\";" | $sudo tee ${APT_PROXY_CONF}
+    echo "Acquire::http::Proxy \"${HTTP_PROXY}\";" | $sudo tee ${APT_PROXY_CONF} 1>/dev/null
   fi
 
   # Proxy for package archives accessed via HTTPS
   if [ "${HTTPS_PROXY:+set}" == set ]; then
-    echo "Acquire::https::Proxy \"${HTTPS_PROXY}\";" | $sudo tee -a ${APT_PROXY_CONF}
+    echo "Acquire::https::Proxy \"${HTTPS_PROXY}\";" | $sudo tee -a ${APT_PROXY_CONF} 1>/dev/null
   fi
 
   # Proxy for package archives accessed via FTP
   if [ "${FTP_PROXY:+set}" == set ]; then
-    echo "Acquire::ftp::Proxy \"${FTP_PROXY}\";" | $sudo tee -a ${APT_PROXY_CONF}
+    echo "Acquire::ftp::Proxy \"${FTP_PROXY}\";" | $sudo tee -a ${APT_PROXY_CONF} 1>/dev/null
   fi
 fi
 unset sudo
