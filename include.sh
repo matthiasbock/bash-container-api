@@ -14,11 +14,11 @@ old_workdir="$(realpath "$(pwd)")"
 # so that the remaining library source files
 # can be sourced using relative paths
 #
-if is_set BASH_CONTAINER_LIBRARY; then
+if [ "$BASH_CONTAINER_LIBRARY" != "" ]; then
   # Use explicitly provided path setting
   bash_container_library="$BASH_CONTAINER_LIBRARY"
 else
-  if ! is_set bash_container_library; then
+  if [ "$bash_container_library" == "" ]; then
     # Use the path to this file as library path
     include_sh="${BASH_SOURCE[0]}"
     bash_container_library="$(dirname "$include_sh")"
