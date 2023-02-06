@@ -5,6 +5,7 @@
 # - apt client
 # - git client
 # - docker client
+# - gpg client
 #
 # Note:
 # apt configuration requires sudo with NOPASSWD for the current user.
@@ -65,7 +66,7 @@ elif [ "$USER" == "root" ]; then
   sudo=""
 fi
 if [ "${sudo:+set}" != set ]; then
-  echo "Warning: sudo is required for apt proxy auto-configuration. Install with \"apt install sudo\"."
+  echo "Warning: Unable to configure apt. Non-root users need sudo, which is not available (install with \"apt install sudo\")."
 else
   APT_PROXY_CONF="/etc/apt/apt.conf.d/10proxy.conf"
   $sudo mkdir -p $(dirname ${APT_PROXY_CONF})
@@ -110,7 +111,7 @@ fi
 #
 if [ "$(which docker)" != "" ]; then
   if [ "$(which jq)" == "" ]; then
-    echo "Warning: jq is required for docker proxy auto-configuration. Install with \"apt install jq\"."
+    echo "Warning: Unable to configure docker. jq is not available (install with \"apt install jq\")."
   else
     DOCKER_CONFIG="$HOME/.docker/config.json"
 
@@ -140,5 +141,34 @@ if [ "$(which docker)" != "" ]; then
       | jq --indent 2 ".proxies.default.noProxy=\"${NO_PROXY}\"" \
       | tee ${DOCKER_CONFIG}
     fi
+  fi
+fi
+
+#
+# If GnuPG is installed, configure it to use the proxy for keyserver interaction
+#
+if [ "$(which gpg)" != "" ]; then
+  if [ "$HOME" == "" ] && [ "$GNUPGHOME" == "" ]; then
+    echo "Warning: Unable to configure GnuPG. gpg is available, but neither HOME nor GNUPGHOME are set."
+  else
+    # Determine config directory and filename
+    if [ "$GNUPGHOME" == "" ]; then
+      GNUPGHOME="$(realpath "$HOME")/.gnupg"
+    fi
+    GPGCONF="$GNUPGHOME/gpg.conf"
+
+    # Create config directory and file
+    mkdir -p "$GNUPGHOME"
+    touch "$GPGCONF"
+
+    # Remove existing proxy settings
+    sed -E "s/http-proxy [^\n]*//" -i "$GPGCONF"
+
+    # Append proxy setting
+    echo >> "$GPGCONF"
+    echo "http-proxy $HTTP_PROXY" >> $GPGCONF
+
+    # Strip protocol from proxy setting
+    sed -E "s/http-proxy http:\/\/([^\n]*)/http-proxy \1/g" -i "$GPGCONF"
   fi
 fi
