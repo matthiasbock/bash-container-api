@@ -3,6 +3,7 @@
 script_under_test=src/utils/web.sh
 
 # Import test framework
+set -e
 . src/testing.sh
 testing_begins $0 $script_under_test
 
@@ -11,6 +12,7 @@ testing_begins $0 $script_under_test
 
 # Import the functions under test
 . $script_under_test
+set +e
 
 #
 # Test function get_page()

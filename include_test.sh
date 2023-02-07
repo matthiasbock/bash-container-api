@@ -3,7 +3,9 @@
 script_under_test=include.sh
 
 # Import test framework
+set -e
 . src/testing.sh
+set +e
 testing_begins $0 $script_under_test
 
 # Import the functions under test
