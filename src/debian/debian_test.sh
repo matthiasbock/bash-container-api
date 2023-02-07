@@ -19,12 +19,12 @@ testing_begins $0 $script_under_test
 
 # This should return a bunch of URLs
 echo -n "Requesting an existing package:    "
-urls=$(get_debian_package_download_urls lynx)
+urls=$(get_debian_package_download_urls lynx 2>/dev/null)
 test_eval $?
 
 # Such a program does not exist
 echo -n "Requesting a non-existent package: "
-urls=$(get_debian_package_download_urls theehee)
+urls=$(get_debian_package_download_urls theehee 2>/dev/null)
 [[ $? != 0 ]]
 test_eval $?
 
@@ -33,13 +33,13 @@ test_eval $?
 #
 echo -n "Download an existing package:      "
 rm -f /tmp/*.deb
-path=$(debian_download_package lynx)
+path=$(debian_download_package lynx 2>/dev/null)
 test_eval $?
 rm -f /tmp/*.deb
 
 echo -n "Download a non-existent package:   "
 rm -f /tmp/*.deb
-path=$(debian_download_package theehee)
+path=$(debian_download_package theehee 2>/dev/null)
 [[ $? != 0 ]]
 test_eval $?
 rm -f /tmp/*.deb

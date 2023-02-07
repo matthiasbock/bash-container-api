@@ -17,16 +17,16 @@ testing_begins $0 $script_under_test
 #
 echo -n "Fetching an existing URL:    "
 url="https://www.debian.org/"
-page=$(get_page $url)
+page=$(get_page $url 2>/dev/null)
 test_eval $?
 
 echo -n "Another way to evaluate:     "
-page=$(get_page $url)
+page=$(get_page $url 2>/dev/null)
 [[ $? == 0 ]]
 test_eval $?
 
 echo -n "Yet another way to evaluate: "
-page=$(get_page $url)
+page=$(get_page $url 2>/dev/null)
 if [[ $? == 0 ]]; then
   pass
 else
@@ -38,14 +38,14 @@ echo -n "The page is not empty:       "
 test_eval $?
 
 echo -n "Another way to evaluate:     "
-if [[ "$(get_page $url)" != "" ]]; then
+if [[ "$(get_page $url 2>/dev/null)" != "" ]]; then
   pass
 else
   fail
 fi
 
 echo -n "Yet another way to evaluate: "
-if [ "$(get_page $url)" != "" ]; then
+if [ "$(get_page $url 2>/dev/null)" != "" ]; then
   pass
 else
   fail
@@ -53,7 +53,7 @@ fi
 
 echo -n "Fetching an invalid URL:     "
 url="https://www.theehee.org/"
-page=$(get_page $url)
+page=$(get_page $url 2>/dev/null)
 [[ $? != 0 ]]
 test_eval $?
 
