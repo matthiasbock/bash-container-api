@@ -111,7 +111,10 @@ function container_create() {
   fi
 
   # Verify container creation
-  sleep 1
+  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+    container_exists "$container_name" && break
+    sleep 1
+  done
 	if ! container_exists $container_name; then
 		echo "Error: Container creation failed." >&2
 		return $ERROR_COMMAND_FAILED
@@ -135,8 +138,18 @@ function container_start() {
 
   # Attempt to start container
 	$container_cli container start "$container_name" >&2
-  sleep 1
-  return $?
+  local retval=$?
+  [[ $retval == 0 ]] || return $retval
+
+  # Verify container start
+  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+    container_is_running "$container_name" && break
+    sleep 1
+  done
+  if ! container_is_running "$container_name"; then
+    echo "Error: Failed to start container." >&2
+    return $ERROR_CONTAINER_NOT_RUNNING
+  fi
 }
 
 
@@ -163,9 +176,14 @@ function container_stop() {
   [[ $retval == 0 ]] || return $retval
 
   # Verify command success
-  sleep 1
-  container_is_running "$container_name" && return $ERROR_COMMAND_FAILED
-  return $SUCCESS
+  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+    container_is_running "$container_name" || break
+    sleep 1
+  done
+  if container_is_running "$container_name"; then
+    echo "Error: Failed to stop container." >&2
+    return $ERROR_CONTAINER_RUNNING
+  fi
 }
 
 
@@ -248,6 +266,10 @@ function container_remove() {
 	$container_cli container rm $container_name 1>&2
 
   # Verify removal success
+  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+    container_exists "$container_name" || break
+    sleep 1
+  done
   if container_exists "$container_name"; then
 		echo "Error: Container removal failed." >&2
     return $ERROR_COMMAND_FAILED
