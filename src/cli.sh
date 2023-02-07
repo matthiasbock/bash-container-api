@@ -29,8 +29,12 @@ else
     echo "Error: No program for container manipulation is available." >&2
   fi
 fi
-if [ "$container_cli" == "" ]; then
-  # container_cli must not be left empty
-  # or unforseeable things may happen when container functions are called.
-  container_cli="@echo \$ podman-stub"
-fi
+
+
+#
+# Determine whether the currently set container CLI is valid
+#
+function verify_container_cli() {
+  [[ "$container_cli" != "" ]] || return $ERROR_ILLEGAL_CONTAINER_CLI
+  is_program_available "$container_cli" || return $ERROR_ILLEGAL_CONTAINER_CLI
+}
