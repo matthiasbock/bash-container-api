@@ -2,11 +2,6 @@
 test bash-container-library:
   stage: test
   image: registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library
-  variables:
-    GIT_SUBMODULE_STRATEGY: normal
-    GIT_SUBMODULE_DEPTH: 1
-    GIT_SUBMODULE_PATHS: lib/sdat2img
-    CONTAINER_CLI: podman
   script:
     - . /etc/profile
     - make test
