@@ -1,7 +1,23 @@
 
 test bash-container-library:
-  stage: test
-  image: registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - **/*.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
     - . /etc/profile
-    - make test
+    - make --keep-going test
+
+
+test include.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - **/*.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make include_test.sh-run

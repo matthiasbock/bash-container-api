@@ -1,12 +1,12 @@
 
 SHELL=/bin/bash
 TESTS=$(shell find . -maxdepth 4 -type f -name "*_test.sh")
-TEST_OUT=$(addsuffix .run,$(basename $(TESTS)))
+TEST_OUT=$(addsuffix .sh-run,$(basename $(TESTS)))
 
 
 test: $(TEST_OUT)
 
-%.run: %.sh
+%.sh-run: %.sh
 	@chmod +x $<
 	./$<
 
