@@ -11,30 +11,32 @@
 function container_create_user()
 {
   local container_name="$1"
-  local user="$2"
+  local username="$2"
   local groups="${@:3}"
 
+  # TODO: Implement setting a custom UID:GID
+
   shell="/bin/bash"
-  home="/home/$user"
+  home="/home/$username"
 
   # Check if the user already exists
-  uid=$(container_exec $container_name id $user | fgrep uid)
+  uid=$(container_exec $container_name id $username | fgrep uid)
   if [ "$uid" != "" ]; then
-    echo "Creating user $user: Already exists. Skipping."
+    echo "Creating user $username: Already exists. Skipping."
   else
-    echo -n "Creating user $user with home at $home ... "
+    echo -n "Creating user $username with home at $home ... "
 
-    # In case a group named $user already exists, add the new user to it.
+    # In case a group named $username already exists, add the new user to it.
     add_to_group=""
     gid=$(container_exec $container_name getent group $group)
     if [ "$gid" != "" ]; then
       add_group="-g $group"
     fi
 
-    # Create a user and a group named $user
+    # Create a user and a group named $username
     container_exec $container_name mkdir -p $home || return 1
-    container_exec $container_name useradd -d $home -s $shell $add_to_group $user || return 1
-    container_exec $container_name chown -R $user.$user $home || return 1
+    container_exec $container_name useradd -d $home -s $shell $add_to_group $username || return 1
+    container_exec $container_name chown -R $username.$username $home || return 1
     echo "ok."
   fi
 
@@ -45,8 +47,8 @@ function container_create_user()
 
     # Add user to one group after another
     for group in $groups; do
-      echo -n "Adding $user to group $group ... "
-      container_exec $container_name usermod -aG $group $user
+      echo -n "Adding $username to group $group ... "
+      container_exec $container_name usermod -aG $group $username
       echo "ok."
     done
     echo "Done."
