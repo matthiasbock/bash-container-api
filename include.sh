@@ -29,6 +29,9 @@ cd "$bash_container_library"
 assets_dir="$bash_container_library/assets"
 keys_dir="$assets_dir/keys"
 
+# Include global constants
+. src/constants.sh
+
 # Include functions for local tasks
 . src/utils/local.sh
 
