@@ -28,7 +28,7 @@ fi
 
 # Add symlink to pytest, if missing
 if [ -e /usr/bin/pytest-3 ] && [ ! -e /usr/bin/pytest ] && [ ! -e $HOME/.local/bin/pytest ]; then
-  if [ $(id) == 0 ]; then
+  if [ "$(id -u)" == 0 ]; then
     ln -s /usr/bin/python-3 /usr/bin/pytest
   else
     if [ "$HOME" != "" ]; then

@@ -21,7 +21,7 @@ fi
 
 # No (recently modified) lists found
 if [ "$lists" == "" ]; then
-  if [ $(id) != 0 ] && [ "$(which sudo)" == "" ]; then
+  if [ "$(id -u)" != 0 ] && [ "$(which sudo)" == "" ]; then
     echo "Warning: sudo is required to update package lists, but missing (install with \"apt install sudo\")."
   else
     # Update package lists
@@ -53,7 +53,7 @@ fi
 
 # Install the given list of Debian/Ubuntu packages
 if [ "$APT_INSTALL" != "" ]; then
-  if [ $(id) != 0 ] && [ "$(which sudo)" == "" ]; then
+  if [ "$(id -u)" != 0 ] && [ "$(which sudo)" == "" ]; then
     echo "Warning: sudo is required to install package dependencies, but missing (install with \"apt install sudo\")."
   else
     echo "Installing packages: $(echo $APT_INSTALL)"
