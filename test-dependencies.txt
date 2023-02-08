@@ -4,6 +4,8 @@ make
 inotify-tools
 bash
 coreutils
+tar
+jq
 podman
 uidmap
 aria2
