@@ -1,6 +1,6 @@
 
-variables:
-  GIT_SUBMODULE_STRATEGY: none
+stages:
+  - testing
 
 include:
   - test.yml

@@ -4,7 +4,7 @@ test bash-container-library:
   rules:
     - when: manual
     - changes:
-      - **/*.sh
+      - "**/*.sh"
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
     - . /etc/profile
@@ -16,8 +16,81 @@ test include.sh:
   rules:
     - when: manual
     - changes:
-      - **/*.sh
+      - "**/*.sh"
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
     - . /etc/profile
     - make include_test.sh-run
+
+
+test debian.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+      - src/utils/web.sh
+      - src/debian/*
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make src/debian/debian_test.sh-run
+
+
+test local.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make src/utils/local_test.sh-run
+
+
+test web.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/web.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make src/utils/web_test.sh-run
+
+
+test control.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+      - src/cli.sh
+      - src/constants.sh
+      - src/control.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make src/control_test.sh-run
+
+
+test images.sh:
+  stage: testing
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+      - src/cli.sh
+      - src/constants.sh
+      - src/images.sh
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile
+    - make src/images_test.sh-run
