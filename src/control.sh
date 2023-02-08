@@ -111,7 +111,7 @@ function container_create() {
   fi
 
   # Verify container creation
-  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+  for timeout in $container_cli_timeout; do
     container_exists "$container_name" && break
     sleep 1
   done
@@ -142,7 +142,7 @@ function container_start() {
   [[ $retval == 0 ]] || return $retval
 
   # Verify container start
-  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+  for timeout in $container_cli_timeout; do
     container_is_running "$container_name" && break
     sleep 1
   done
@@ -176,7 +176,7 @@ function container_stop() {
   [[ $retval == 0 ]] || return $retval
 
   # Verify command success
-  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+  for timeout in $container_cli_timeout; do
     container_is_running "$container_name" || break
     sleep 1
   done
@@ -266,7 +266,7 @@ function container_remove() {
 	$container_cli container rm $container_name 1>&2
 
   # Verify removal success
-  for timeout in 1 2 3 4 5 6 7 8 9 10; do
+  for timeout in $container_cli_timeout; do
     container_exists "$container_name" || break
     sleep 1
   done

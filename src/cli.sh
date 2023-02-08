@@ -38,3 +38,9 @@ function verify_container_cli() {
   [[ "$container_cli" != "" ]] || return $ERROR_ILLEGAL_CONTAINER_CLI
   is_program_available "$container_cli" || return $ERROR_ILLEGAL_CONTAINER_CLI
 }
+
+
+#
+# The number of seconds to wait before certain container commands fail
+#
+container_cli_timeout="1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20"
