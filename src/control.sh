@@ -96,10 +96,13 @@ function container_create() {
   else
     verify_container_cli || return $?
 
+    # TODO: Do not copy all of the current user's environment variables
+    # acceptable: PATH=
+    # TODO: explicitly set bash as initial command, and with --login, such that /etc/profile is sourced
+
     # Note: It is necessary to specify -it, otherwise the container will not remain up after creation.
     $container_cli create \
       -it \
-      $container_networking \
       $CONTAINER_CLI_CREATE_ARGS \
   		--name $container_name \
       --arch $container_architecture \
