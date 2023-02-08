@@ -7,6 +7,12 @@
 #
 DEBIAN_FRONTEND="noninteractive"
 
+# Non-root users need sudo
+sudo=""
+if [ "$(id -u)" != 0 ] && [ "$(which sudo)" != "" ]; then
+  sudo="sudo"
+fi
+
 # Get package lists
 lists=""
 if [ "$APT_UPDATE_INTERVAL" != "" ]; then
@@ -25,7 +31,7 @@ if [ "$lists" == "" ]; then
     echo "Warning: sudo is required to update package lists, but missing (install with \"apt install sudo\")."
   else
     # Update package lists
-    sudo apt-get update -q
+    $sudo apt-get update -q || true
   fi
 fi
 unset lists
@@ -57,7 +63,8 @@ if [ "$APT_INSTALL" != "" ]; then
     echo "Warning: sudo is required to install package dependencies, but missing (install with \"apt install sudo\")."
   else
     echo "Installing packages: $(echo $APT_INSTALL)"
-    sudo apt-get -q install -y --no-install-suggests --no-install-recommends $APT_INSTALL;
+    $sudo apt-get -q install -y --no-install-suggests --no-install-recommends $APT_INSTALL
     echo "Finished installing packages."
   fi
 fi
+unset sudo
