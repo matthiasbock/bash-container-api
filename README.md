@@ -133,13 +133,13 @@ container_names=$(get_container_names)
 echo $container_names
 ~~~
 
-### Use docker with additional arguments for container manipulation
+### Use docker to create a priviledged container
 
 ~~~
 #!/bin/bash
 
 # Select docker as container interface
-CONTAINER_CLI=podman
+CONTAINER_CLI=docker
 
 # Explicitly grant superuper permissions to the new container
 CONTAINER_CLI_RUN_ARGS="--privileged"
