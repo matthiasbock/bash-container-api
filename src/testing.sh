@@ -46,8 +46,9 @@ function pass() {
 }
 
 function fail() {
-  test_result=1
-  echo -e "\033[31;1mFAIL\033[0m"
+  local retval=$1
+  test_result=$retval
+  echo -e "\033[31;1mFAIL\033[0m (return code $retval)"
 }
 
 function test_eval() {
@@ -55,6 +56,6 @@ function test_eval() {
   if [ $retval == 0 ]; then
     pass
   else
-    fail
+    fail $retval
   fi
 }
