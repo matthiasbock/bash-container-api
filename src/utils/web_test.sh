@@ -19,16 +19,16 @@ set +e
 #
 echo -n "Fetching an existing URL:    "
 url="https://www.debian.org/"
-page=$(get_page $url 2>/dev/null)
+page=$(get_page $url)
 test_eval $?
 
 echo -n "Another way to evaluate:     "
-page=$(get_page $url 2>/dev/null)
+page=$(get_page $url)
 [[ $? == 0 ]]
 test_eval $?
 
 echo -n "Yet another way to evaluate: "
-page=$(get_page $url 2>/dev/null)
+page=$(get_page $url)
 if [[ $? == 0 ]]; then
   pass
 else
@@ -40,14 +40,14 @@ echo -n "The page is not empty:       "
 test_eval $?
 
 echo -n "Another way to evaluate:     "
-if [[ "$(get_page $url 2>/dev/null)" != "" ]]; then
+if [[ "$(get_page $url)" != "" ]]; then
   pass
 else
   fail
 fi
 
 echo -n "Yet another way to evaluate: "
-if [ "$(get_page $url 2>/dev/null)" != "" ]; then
+if [ "$(get_page $url)" != "" ]; then
   pass
 else
   fail
@@ -55,7 +55,7 @@ fi
 
 echo -n "Fetching an invalid URL:     "
 url="https://www.theehee.org/"
-page=$(get_page $url 2>/dev/null)
+page=$(get_page $url)
 [[ $? != 0 ]]
 test_eval $?
 
@@ -70,14 +70,14 @@ echo -n "Download an existing Debian package:   "
 filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
 rm -f $filepath
 url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw6_6.2+20201114-2_amd64.deb"
-get_file $filepath $url &>/dev/null
+get_file $filepath $url
 test_eval $?
 
 echo -n "Request a non-existent Debian package: "
 filepath="/tmp/libncursesw6_6.2+20201114-2_amd64.deb"
 rm -f $filepath
 url="http://ftp.de.debian.org/debian/pool/main/n/ncurses/libncursesw12345_amd64.deb"
-get_file $filepath $url &>/dev/null
+get_file $filepath $url
 [[ $? != 0 ]]
 test_eval $?
 
