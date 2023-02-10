@@ -41,11 +41,44 @@ test web.sh:
     - when: manual
     - changes:
       - src/testing.sh
+      - src/utils/local.sh
       - src/utils/web.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
     - . /etc/profile || true
     - make src/utils/web_test.sh-run
+
+
+test github.sh:
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+      - src/utils/web.sh
+      - src/constants.sh
+      - src/webapi/github.sh
+  needs: ["test web.sh"]
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile || true
+    - make src/webapi/github_test.sh-run
+
+
+test sourceforge.sh:
+  rules:
+    - when: manual
+    - changes:
+      - src/testing.sh
+      - src/utils/local.sh
+      - src/utils/web.sh
+      - src/constants.sh
+      - src/webapi/sourceforge.sh
+  needs: ["test web.sh"]
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile || true
+    - make src/web/sourceforge_test.sh-run
 
 
 test control.sh:
