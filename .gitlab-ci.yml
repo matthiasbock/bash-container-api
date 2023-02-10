@@ -25,11 +25,18 @@ sync github:
   rules:
     - when: always
   image: "registry.bihealth.org:443/bockm/recipes/debian:bullseye-amd64"
-  script:
+  before_script:
     - . /etc/profile || true
+    - git remote rm bih || true
+    - git remote rm github || true
+  script:
     - git remote add bih https://git.bihealth.org/bockm/bash-container-library.git
     - git remote add github https://github.com/matthiasbock/bash-container-library.git
-    - git pull github ${CI_COMMIT_BRANCH} --ff-only
-    - git pull bih ${CI_COMMIT_BRANCH} --ff-only
-    - git push github ${CI_COMMIT_BRANCH}
+    - git checkout ${CI_COMMIT_BRANCH}
+    - git pull --ff-only bih ${CI_COMMIT_BRANCH}
+    - git pull --ff-only github ${CI_COMMIT_BRANCH}
     - git push bih ${CI_COMMIT_BRANCH}
+    - git push github ${CI_COMMIT_BRANCH}
+  after_script:
+    - git remote rm bih || true
+    - git remote rm github || true
