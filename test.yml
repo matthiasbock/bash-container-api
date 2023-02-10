@@ -1,6 +1,5 @@
 
 test bash-container-library:
-  stage: testing
   rules:
     - when: manual
     - changes:
@@ -12,7 +11,6 @@ test bash-container-library:
 
 
 test include.sh:
-  stage: testing
   rules:
     - when: manual
     - changes:
@@ -24,7 +22,6 @@ test include.sh:
 
 
 test debian.sh:
-  stage: testing
   rules:
     - when: manual
     - changes:
@@ -39,7 +36,6 @@ test debian.sh:
 
 
 test local.sh:
-  stage: testing
   rules:
     - when: manual
     - changes:
@@ -65,7 +61,6 @@ test web.sh:
 
 
 test control.sh:
-  stage: testing
   rules:
     - when: manual
     - changes:
@@ -81,7 +76,6 @@ test control.sh:
 
 
 test images.sh:
-  stage: testing
   rules:
     - when: manual
     - changes:

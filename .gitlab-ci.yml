@@ -1,6 +1,3 @@
 
-stages:
-  - testing
-
 include:
   - test.yml
