@@ -6,7 +6,7 @@ test bash-container-library:
       - "**/*.sh"
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make --keep-going test
 
 
@@ -17,7 +17,7 @@ test include.sh:
       - "**/*.sh"
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make include_test.sh-run
 
 
@@ -31,7 +31,7 @@ test debian.sh:
       - src/debian/*
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make src/debian/debian_test.sh-run
 
 
@@ -43,7 +43,7 @@ test local.sh:
       - src/utils/local.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make src/utils/local_test.sh-run
 
 
@@ -56,7 +56,7 @@ test web.sh:
       - src/utils/web.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make src/utils/web_test.sh-run
 
 
@@ -71,7 +71,7 @@ test control.sh:
       - src/control.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make src/control_test.sh-run
 
 
@@ -86,5 +86,5 @@ test images.sh:
       - src/images.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   script:
-    - . /etc/profile
+    - . /etc/profile || true
     - make src/images_test.sh-run
