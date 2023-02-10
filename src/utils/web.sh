@@ -3,7 +3,7 @@
 # Functions for interaction with web pages
 #
 # Note:
-# Requires local.sh to be included earlier.
+# Requires constants.sh and local.sh to be included earlier.
 #
 
 default_user_agent="bash-container-library"
@@ -16,7 +16,11 @@ default_user_agent="bash-container-library"
 # @return 1 upon errors and possibly an error message on stdout
 #
 function get_page() {
+
   local url="$1"
+
+  # Check argument
+  [[ "$url" != "" ]] || return $ERROR_MISSING_ARGUMENT
 
   # If no user_agent is defined globally, use the default one.
   if ! is_set user_agent; then
@@ -25,11 +29,11 @@ function get_page() {
 
   # Select a program for download
   if is_program_available wget; then
-    wget -q -O - --user-agent="$user_agent" "$url" 2>/dev/null || return 1
-    return 0
+    wget -q -O - --user-agent="$user_agent" "$url" 2>/dev/null || return $ERROR_CRAWLER_FAILED
   # TODO: support using curl or aria2c as alternatives
+  else
+    return $ERROR_CRAWLER_MISSING
   fi
-  return 1
 }
 
 
@@ -40,13 +44,14 @@ function get_page() {
 # @return 1 upon errors
 #
 function get_file() {
+
   local filepath="$1"
   local urls=${@:2}
   local url=$2
 
   # Check arguments
-  [[ "$filepath" != "" ]] || return 1
-  [[ "$url" != "" ]] || return 1
+  [[ "$filepath" != "" ]] || return $ERROR_MISSING_ARGUMENT
+  [[ "$url" != "" ]] || return $ERROR_MISSING_ARGUMENT
 
   # If no user_agent is defined globally, use the default one.
   if ! is_set user_agent; then
@@ -63,17 +68,16 @@ function get_file() {
   if is_program_available aria2c; then
     local dir="$(dirname "$filepath")"
     local fn="$(basename "$filepath")"
-    aria2c -c --user-agent="$user_agent" --dir="$dir" --out="$fn" $urls 1>&2 || return 1
+    aria2c -c --user-agent="$user_agent" --dir="$dir" --out="$fn" $urls 1>&2 || return $ERROR_CRAWLER_FAILED
   elif is_program_available wget; then
-    wget -c --progress=dot --user-agent="$user_agent" -O "$filepath" $url 1>&2 || return 1
+    wget -c --progress=dot --user-agent="$user_agent" -O "$filepath" $url 1>&2 || return $ERROR_CRAWLER_FAILED
   elif is_program_available curl; then
-    curl -C - --user-agent "$user_agent" -o "$filepath" $url 1>&2 || return 1
+    curl -C - --user-agent "$user_agent" -o "$filepath" $url 1>&2 || return $ERROR_CRAWLER_FAILED
   else
-    echo "Error: No download program is available."
-    return 1
+    echo "Error: No downloader program is available."
+    return $ERROR_CRAWLER_MISSING
   fi
 
-  # Return success status
-  [[ -f "$filepath" ]] || return 1
-  return 0
+  # Determine success
+  [[ -f "$filepath" ]] || return $ERROR_COMMAND_FAILED
 }
