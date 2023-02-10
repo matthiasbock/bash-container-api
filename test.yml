@@ -62,7 +62,6 @@ test github.sh:
       - src/utils/web.sh
       - src/constants.sh
       - src/webapi/github.sh
-  needs: ["test web.sh"]
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   before_script:
     - . /etc/profile || true
@@ -79,12 +78,11 @@ test sourceforge.sh:
       - src/utils/web.sh
       - src/constants.sh
       - src/webapi/sourceforge.sh
-  needs: ["test web.sh"]
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
   before_script:
     - . /etc/profile || true
   script:
-    - make src/web/sourceforge_test.sh-run
+    - make src/webapi/sourceforge_test.sh-run
 
 
 test control.sh:
