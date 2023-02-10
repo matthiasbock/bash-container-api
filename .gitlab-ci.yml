@@ -17,3 +17,19 @@ make test:
 #
 include:
   - test.yml
+
+#
+# Synchronize GitHub repository
+#
+sync github:
+  rules:
+    - when: always
+  image: "registry.bihealth.org:443/bockm/recipes/debian:bullseye-amd64"
+  script:
+    - . /etc/profile || true
+    - git remote add bih https://git.bihealth.org/bockm/bash-container-library.git
+    - git remote add github https://github.com/matthiasbock/bash-container-library.git
+    - git pull github ${CI_COMMIT_BRANCH} --ff-only
+    - git pull bih ${CI_COMMIT_BRANCH} --ff-only
+    - git push github ${CI_COMMIT_BRANCH}
+    - git push bih ${CI_COMMIT_BRANCH}
