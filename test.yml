@@ -5,8 +5,9 @@ test include.sh:
     - changes:
       - "**/*.sh"
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make include_test.sh-run
 
 
@@ -19,8 +20,9 @@ test debian.sh:
       - src/utils/web.sh
       - src/debian/*
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/debian/debian_test.sh-run
 
 
@@ -31,8 +33,9 @@ test local.sh:
       - src/testing.sh
       - src/utils/local.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/utils/local_test.sh-run
 
 
@@ -44,8 +47,9 @@ test web.sh:
       - src/utils/local.sh
       - src/utils/web.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/utils/web_test.sh-run
 
 
@@ -60,8 +64,9 @@ test github.sh:
       - src/webapi/github.sh
   needs: ["test web.sh"]
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/webapi/github_test.sh-run
 
 
@@ -76,8 +81,9 @@ test sourceforge.sh:
       - src/webapi/sourceforge.sh
   needs: ["test web.sh"]
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/web/sourceforge_test.sh-run
 
 
@@ -91,8 +97,9 @@ test control.sh:
       - src/constants.sh
       - src/control.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/control_test.sh-run
 
 
@@ -106,6 +113,7 @@ test images.sh:
       - src/constants.sh
       - src/images.sh
   image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
-  script:
+  before_script:
     - . /etc/profile || true
+  script:
     - make src/images_test.sh-run
