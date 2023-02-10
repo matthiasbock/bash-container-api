@@ -1,3 +1,19 @@
 
+#
+# Run all tests
+#
+make test:
+  rules:
+    - when: manual
+    - changes:
+      - "**/*.sh"
+  image: "registry.bihealth.org:443/bockm/recipes/testenv:bash-container-library"
+  script:
+    - . /etc/profile || true
+    - make --keep-going test
+
+#
+# Individual tests
+#
 include:
   - test.yml
