@@ -26,10 +26,8 @@ function container_debian_install_packages() {
   # TODO: implement:
   # ensure_container_running $container_name || return $?
 
-  # Silently return, when no package arguments were given
-	if [ "$pkgs" == "" ]; then
-		return 0
-	fi
+  # Silently quit when no package arguments were given
+	[[ "$pkgs" == "" ]] && return
 
   #
   # Consider it a mistake, when we arrive here
@@ -53,19 +51,19 @@ function container_debian_install_packages() {
 
   # Try apt-get
   container_exec $container_name apt-get -q install -y $pkgs
-	[[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+	[[ $? == 0 ]] && { echo "Installation successful."; return; }
 
   # Try apt
 	echo "Warning: Installation with apt-get failed."
   echo "Re-trying with apt..."
 	container_exec $container_name apt -q install -y $pkgs
-  [[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+  [[ $? == 0 ]] && { echo "Installation successful."; return; }
 
   # Try aptitude
   echo "Warning: Installation with apt failed."
   echo "Re-trying with aptitude..."
 	container_exec $container_name aptitude -q install -y $pkgs
-  [[ $? == 0 ]] && { echo "Installation successful."; return 0; }
+  [[ $? == 0 ]] && { echo "Installation successful."; return; }
 
   # Try one after another
   echo "Warning: Installation with aptitude failed."
@@ -90,10 +88,8 @@ function container_debian_install_package_bundles() {
   local container_name="$1"
 	local package_bundles="${@:2}"
 
-  # Silently return, when no bundle arguments were given
-  if [ "$package_bundles" == "" ]; then
-    return 0
-  fi
+  # Silently quit when no bundle arguments were given
+  [[ "$package_bundles" == "" ]] && return
 
   # Compile a list of packages from the given bundles
   local pkgs=""
@@ -106,23 +102,21 @@ function container_debian_install_package_bundles() {
         bundle="$filename"
       else
         echo "Error: Package bundle not found: \"$bundle\"" >&2
-        return 1
+        return $ERROR_ILLEGAL_ARGUMENT
       fi
     fi
 
 	  echo -n "Loading package bundle: \"$bundle\": "
     add="$(cat "$bundle")" || {
       echo "Error: Failed to load package bundle from \"$bundle\"." >&2
-      return 2
+      return $ERROR_ASSET_NOT_FOUND
     }
     echo "$(echo $add | wc -w) package(s)."
 	  local pkgs="$pkgs $add"
 	done
 
-  # Silently return, when package bundles are empty
-  if [ "$pkgs" == "" ]; then
-    return 0
-  fi
+  # Silently quit when package bundles are empty
+  [[ "$pkgs" == "" ]] && return
 
   echo -e "Installing additional packages:\n$pkgs"
 	container_debian_install_packages $container_name $pkgs || return $?
@@ -140,34 +134,29 @@ function container_debian_install_package_from_url()
   local container_name="$1"
   local url="$2"
   local filename="$(basename $url)"
-  local retval=0
   local pkg_archive="/var/cache/apt/archives/"
 
   # Download file
-  echo "Installing package $filename from $url ..."
-  wget --progress=dot "$url" -O "$filename" \
-   || { echo "File download failed. Package installation failed."; retval=1; }
+  echo "Installing package $filename from $url ..." >&2
+  # TODO: use get_file
+  wget --progress=dot "$url" -O "$filename"
+  local retval=$?
+  [[ $retval == 0 ]] || { echo "Error: File download failed."; return $retval; }
 
   # Insert file into container
-  if [ $retval == 0 ]; then
-    container_add_file "$container_name" "$filename" "$pkg_archive" \
-     || { echo "Failed to add downloaded file to container."; retval=1; }
-  fi
-  rm -f "$filename"
+  container_add_file "$container_name" "$filename" "$pkg_archive"
+  local retval=$?
+  [[ $retval == 0 ]] || { echo "Error: Failed to add downloaded file to container."; return $retval; }
+  rm -f "$filename" || true
 
   # Invoke dpkg to install it
-  if [ $retval == 0 ]; then
-    $container_cli exec -it -u root -w "$pkg_archive" "$container_name" dpkg -i --force-depends "$filename" \
-     || { echo "dpkg returned an error."; retval=1; }
-    $container_cli exec -t -u root -w "$pkg_archive" "$container_name" rm -f "$filename"
-  fi
+  container_exec $container_name dpkg -i --force-depends "$filename"
+  local retval=$?
+  [[ $retval == 0 ]] || { echo "Error: dpkg failed (return code $retval)."; return $ERROR_COMMAND_FAILED; }
+  container_rm_file $container_name || true
 
   # Inform about the success of the procedure
-  if [ $retval == 0 ]; then
-    echo "Package installation was successful."
-  else
-    echo "Package installation failed."
-  fi
+  echo "Package installation was successful." >&2
   return $retval
 }
 
@@ -207,10 +196,12 @@ function get_debian_package_download_urls() {
   # Fetch the package's page, which (hopefully) contains some download links
   local url="https://packages.debian.org/$debian_release/$target_architecture/$package_name/download"
   echo "Fetching $url ..." >&2
-  local page=$(get_page $url) || { echo "Error: get_page() failed." >&2; return 2; }
+  local page=$(get_page $url)
+  local retval=$?
+  [[ $retval == 0 ]] || { echo "Error: get_page() failed." >&2; return $retval; }
 
   # The page cannot be empty
-  [[ "$page" != "" ]] || { echo "Error: Page is empty." >&2; return 3; }
+  [[ "$page" != "" ]] || { echo "Error: Page is empty." >&2; return $ERROR_CRAWLER_FAILED; }
 
   # Apply regular expressions to extract download URLs
   urls=$(
@@ -219,11 +210,10 @@ function get_debian_package_download_urls() {
         | cut -d\" -f2
         )
   # An empty list indicates a non-existent package
-  [[ "$urls" != "" ]] || { echo "Error: Failed to parse any URLs from page." >&2; return 4; }
+  [[ "$urls" != "" ]] || { echo "Error: Failed to parse any URLs from page." >&2; return $ERROR_PARSING_FAILED; }
 
-  # Return results
+  # Return results via stdout
   echo $urls
-  return 0
 }
 
 
@@ -247,26 +237,26 @@ function debian_download_package() {
   local urls=$(get_debian_package_download_urls $package_name $debian_release $target_architecture)
   local retval=$?
   [[ $retval == 0 ]] || return $retval
-  [[ "$urls" != "" ]] || { echo "Error: Failed get any URLs." >&2; return 5; }
+  [[ "$urls" != "" ]] || { echo "Error: Failed get any URLs." >&2; return $ERROR_ILLEGAL_ARGUMENT; }
 
   # Work out the target filename
   local url=$(echo $urls | cut -d" " -f1)
   # local cache="/var/cache/apt/archives"
   local cache="/tmp"
   local filename=$(basename $url)
-  [[ "$filename" != "" ]] || { echo "Error: Failed to work out target filename." >&2; return 6; }
+  [[ "$filename" != "" ]] || { echo "Error: Failed to work out target filename." >&2; return $ERROR_ILLEGAL_ARGUMENT; }
   local filepath="$cache/$filename"
 
   # Download file
-  mkdir -p $cache || return 7
-  [[ -d $cache ]] || return 8
+  mkdir -p $cache || return $ERROR_COMMAND_FAILED
+  [[ -d $cache ]] || return $ERROR_COMMAND_FAILED
   get_file "$filepath" $urls &> /dev/null
-  [[ $? == 0 ]] || { echo "Error: File download failed." >&2; return 9; }
-  [[ -f $filepath ]] || return 10
+  local retval=$?
+  [[ $retval == 0 ]] || { echo "Error: File download failed." >&2; return $retval; }
+  [[ -f $filepath ]] || return $ERROR_COMMAND_FAILED
 
-  # Return full path to downloaded package
+  # Return full path to downloaded package via stdout
   echo $filepath
-  return 0
 }
 
 
@@ -290,12 +280,13 @@ function container_debian_download_package_and_install()
   filename=$(debian_download_package $package_name $debian_release $target_architecture)
   local retval=$?
   [[ $retval == 0 ]] || return $retval
-  [[ "$filename" != "" ]] || return 11
-  [[ -f "$filename" ]] || return 12
+  [[ "$filename" != "" ]] || return $ERROR_ILLEGAL_ARGUMENT
+  [[ -f "$filename" ]] || return $ERROR_ILLEGAL_ARGUMENT
 
   # Copy the file to the container
   container_add_file $container_name $filename $filename
-  container_test $container_name -f $filename || { echo "Error: Failed to add file to container." >&2; return 13; }
+  container_test $container_name -f $filename \
+  || { echo "Error: Failed to add file to container." >&2; return $ERROR_COMMAND_FAILED; }
 
   # Install package inside container
   container_exec $container_name dpkg -i $filename
@@ -308,7 +299,7 @@ function container_debian_install_build_dependencies()
   local container_name="$1"
   local package_name="$2"
 
-  container_exec $container_name apt-get -q build-dep -y $package_name || return 1
+  container_exec $container_name apt-get -q build-dep -y $package_name || return $?
 }
 
 
