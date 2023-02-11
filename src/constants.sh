@@ -1,4 +1,7 @@
 
+# Include guard
+constants_sh="$(realpath "${BASH_SOURCE[0]}")"
+
 #
 # Function return codes
 #

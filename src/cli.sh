@@ -1,5 +1,11 @@
 
 #
+# Sourcing this file sets and configures the container interface program
+#
+cli_sh="$(realpath "${BASH_SOURCE[0]}")"
+
+
+#
 # Select the program that will be used for container manipulation
 #
 # Note:

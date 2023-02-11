@@ -2,6 +2,23 @@
 #
 # Functions to manage container images
 #
+# Note:
+# Uses functions from cli.sh and return codes from constants.sh.
+#
+images_sh="$(realpath "${BASH_SOURCE[0]}")"
+cwd="$(dirname "$images_sh")"
+
+# Source dependencies
+if [ "$constants_sh" == "" ]; then
+ . "$cwd/constants.sh"
+fi
+if [ "$local_sh" == "" ]; then
+ . "$cwd/utils/local.sh"
+fi
+if [ "$cli_sh" == "" ]; then
+ . "$cwd/cli.sh"
+fi
+unset cwd
 
 
 #

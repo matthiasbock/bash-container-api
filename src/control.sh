@@ -2,7 +2,20 @@
 #
 # This file contains elementary containers control functions.
 #
+control_sh="$(realpath "${BASH_SOURCE[0]}")"
+cwd="$(dirname "$control_sh")"
 
+# Source dependencies
+if [ "$constants_sh" == "" ]; then
+ . "$cwd/constants.sh"
+fi
+if [ "$local_sh" == "" ]; then
+ . "$cwd/utils/local.sh"
+fi
+if [ "$cli_sh" == "" ]; then
+ . "$cwd/cli.sh"
+fi
+unset cwd
 
 #
 # Return a (space-separated) list of all containers

@@ -3,8 +3,19 @@
 # Functions for interaction with web pages
 #
 # Note:
-# Requires constants.sh and local.sh to be included earlier.
+# Uses functions from constants.sh and local.sh.
 #
+web_sh="$(realpath "${BASH_SOURCE[0]}")"
+cwd="$(dirname "$web_sh")"
+
+# Source dependencies
+if [ "$constants_sh" == "" ]; then
+ . "$cwd/../constants.sh"
+fi
+if [ "$local_sh" == "" ]; then
+ . "$cwd/local.sh"
+fi
+unset cwd
 
 default_user_agent="bash-container-library"
 

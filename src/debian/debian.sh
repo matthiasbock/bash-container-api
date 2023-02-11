@@ -3,8 +3,17 @@
 # primarily to manage the installed packages in a container.
 #
 # Note:
-# Requires functions from local.sh and web.sh.
+# Uses functions from web.sh
+# (as well as constants.sh and local.sh, which are implicitly included)
 #
+debian_sh="$(realpath "${BASH_SOURCE[0]}")"
+cwd="$(dirname "$debian_sh")"
+
+# Source dependencies
+if [ "$web_sh" == "" ]; then
+ . "$cwd/../utils/web.sh"
+fi
+unset cwd
 
 #
 # Call apt in a container to install Debian packages by name

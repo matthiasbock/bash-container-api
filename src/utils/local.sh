@@ -2,6 +2,7 @@
 #
 # Functions operating on the host machine
 #
+local_sh="$(realpath "${BASH_SOURCE[0]}")"
 
 
 #

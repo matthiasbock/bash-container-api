@@ -4,13 +4,22 @@
 #
 # Note:
 # * Some functions may need GITHUB_TOKEN to be set.
-# * Requires inclusion of web.sh and constants.sh.
+# * Uses functions from web.sh and constants from constants.sh.
 # * Depends on jq being installed.
 #
 # Links:
 # - https://docs.github.com/en/rest
 # - https://stateful.com/blog/github-api-list-repositories
 #
+github_sh="$(realpath "${BASH_SOURCE[0]}")"
+cwd="$(dirname "$github_sh")"
+
+# Source dependencies
+if [ "$web_sh" == "" ]; then
+ . "$cwd/../utils/web.sh"
+fi
+unset cwd
+
 
 #
 # Retrieve all (publicly accessible) information

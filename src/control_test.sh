@@ -8,9 +8,6 @@ set -e
 testing_begins $0 $script_under_test
 
 # Import the functions under test
-. src/constants.sh
-. src/utils/local.sh
-. src/cli.sh 2>/dev/null
 . $script_under_test
 set +e
 
